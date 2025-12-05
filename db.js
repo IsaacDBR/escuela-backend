@@ -1,13 +1,14 @@
 const sql = require('mssql');
 
 const dbSettings = {
-    user: 'IsaacDBR_SQLLogin_2',      // Dato tomado de tu imagen
-    password: 'BetetaRamon54', // <--- Escribe aquí la que acabas de crear en Somee
-    server: 'RamonBetetaDB.mssql.somee.com', // Dato tomado de tu imagen
-    database: 'RamonBetetaDB',        // Dato tomado de tu imagen
+    user: 'IsaacDBR_SQLLogin_2',      
+    // AQUÍ ESTÁ EL CAMBIO: Lee la variable que creaste en Render
+    password: process.env.DB_PASSWORD, 
+    server: 'RamonBetetaDB.mssql.somee.com', 
+    database: 'RamonBetetaDB',        
     options: {
         encrypt: false, 
-        trustServerCertificate: true // Importante para Somee
+        trustServerCertificate: true 
     }
 };
 
@@ -16,7 +17,8 @@ async function getConnection() {
         const pool = await sql.connect(dbSettings);
         return pool;
     } catch (error) {
-        console.error('Error conectando a la BD:', error);
+        console.error('ERROR CONECTANDO A BD:', error);
+        throw error; // ESTO ES VITAL para que no falle el login
     }
 }
 
