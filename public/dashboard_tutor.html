@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Tutor</title>
+    <style>
+        /* --- ESTILOS BASE --- */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #e9ecef; margin: 0; display: flex; color: #333; }
+        
+        /* --- SIDEBAR --- */
+        .sidebar { width: 250px; background-color: #007bff; color: white; padding: 20px; box-shadow: 2px 0 10px rgba(0,0,0,0.1); height: 100vh; position: sticky; top: 0; box-sizing: border-box; overflow-y: auto; }
+        .sidebar h3 { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #0056b3; padding-bottom: 15px; font-weight: 700; }
+        .sidebar a { display: block; color: white; padding: 12px 15px; text-decoration: none; border-bottom: 1px solid #0056b3; transition: all 0.3s ease; border-radius: 4px; font-weight: 500; margin-bottom: 5px; }
+        .sidebar a:hover { background-color: #0056b3; padding-left: 20px; }
+        
+        /* --- CONTENIDO --- */
+        .main-content { flex-grow: 1; padding: 30px; background-color: #f8f9fa; }
+        .main-content h2 { color: #333; margin-bottom: 25px; font-size: 28px; border-bottom: 2px solid #007bff; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* --- SECCIONES --- */
+        .section { background-color: #fff; padding: 25px; margin-bottom: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e9ecef; }
+        .section h3 { color: #007bff; border-bottom: 2px solid #f1f1f1; padding-bottom: 10px; margin-top: 0; margin-bottom: 20px; }
+
+        /* --- SELECTOR --- */
+        .child-selector { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 25px; display: flex; align-items: center; gap: 20px; border: 1px solid #e9ecef; }
+        .child-selector select { padding: 10px; font-size: 16px; border-radius: 6px; border: 1px solid #ced4da; flex-grow: 1; }
+        
+        /* --- TABLAS --- */
+        .styled-table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.95em; font-family: sans-serif; box-shadow: 0 0 20px rgba(0, 0, 0, 0.05); border-radius: 8px; overflow: hidden; }
+        .styled-table thead tr { background-color: #007bff; color: #ffffff; text-align: left; }
+        .styled-table th, .styled-table td { padding: 15px; border-bottom: 1px solid #dddddd; text-align: center; }
+        .styled-table th:first-child, .styled-table td:first-child { text-align: left; font-weight: 600; }
+        .styled-table tbody tr:nth-of-type(even) { background-color: #f3f3f3; }
+
+        /* --- BADGES Y CARDS --- */
+        .status-badge { padding: 6px 12px; border-radius: 12px; font-size: 12px; font-weight: bold; }
+        .status-ok { background-color: #d4edda; color: #155724; }
+        .status-warning { background-color: #fff3cd; color: #856404; }
+        
+        .card-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .card { border: 1px solid #ddd; border-radius: 8px; padding: 20px; background: #fff; border-left: 5px solid #007bff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .card.warning { border-left-color: #ffc107; }
+        .card h4 { margin: 0 0 10px 0; color: #333; font-size: 18px; }
+        .card small { color: #666; display: block; margin-bottom: 15px; font-style: italic; font-size: 13px; }
+
+        /* --- CHAT --- */
+        .chat-container { display: flex; height: 550px; border: 1px solid #ddd; border-radius: 10px; overflow: hidden; background: #fff; }
+        .chat-sidebar-list { width: 30%; background-color: #f8f9fa; border-right: 1px solid #ddd; overflow-y: auto; }
+        .contact-item { padding: 15px 20px; border-bottom: 1px solid #eee; cursor: pointer; }
+        .contact-item.active { background-color: #e3f2fd; border-left: 4px solid #007bff; }
+        .chat-area { width: 70%; display: flex; flex-direction: column; background-color: #fff; }
+        .chat-header { padding: 15px 20px; border-bottom: 1px solid #ddd; background-color: #f1f1f1; font-weight: bold; }
+        .chat-messages { flex-grow: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; background-color: #fafafa; }
+        .message { max-width: 75%; padding: 12px 16px; border-radius: 18px; font-size: 14px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .message.received { background-color: #ffffff; align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid #eee; }
+        .message.sent { background-color: #cce5ff; align-self: flex-end; border-bottom-right-radius: 4px; color: #004085; }
+        .chat-input-area { padding: 20px; border-top: 1px solid #ddd; display: flex; gap: 10px; background: #fff; }
+        .chat-input-area input { margin: 0; border-radius: 25px; padding: 12px 20px; flex-grow: 1; border: 1px solid #ccc; }
+        .chat-input-area button { margin: 0; border-radius: 25px; width: auto; padding: 0 30px; height: 42px; background-color: #28a745; color: white; border: none; cursor: pointer; }
+
+        /* --- INPUTS GENERALES --- */
+        input, textarea, select { width: 100%; padding: 10px 12px; margin: 8px 0 15px 0; box-sizing: border-box; border: 1px solid #ced4da; border-radius: 6px; font-size: 14px; }
+        button { background-color: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h3>Portal Familiar</h3>
+        <a href="#avisos">Avisos y Comunicados</a>
+        <a href="#calificaciones">Calificaciones</a>
+        <a href="#asistencias">Asistencias</a>
+        <a href="#observaciones">Observaciones Conducta</a>
+        <a href="#evidencias">Evidencias de Clase</a>
+        <a href="#citas">Citas con Docentes</a>
+        <a href="#chat">Chat con Docente</a>
+        <a href="#" onclick="logout()">Cerrar Sesión</a>
+    </div>
+
+    <div class="main-content">
+        <div class="child-selector">
+            <label><strong>Viendo información de:</strong></label>
+            <select id="studentSelect" onchange="changeStudent()">
+                <option value="">-- Cargando hijos... --</option>
+            </select>
+        </div>
+
+        <h2 id="welcomeMessageTutor">Bienvenido, Tutor</h2>
+
+        <!-- SECCIÓN AVISOS -->
+        <div id="avisos" class="section">
+            <h3>Tablón de Avisos</h3>
+            <div class="card-container">
+                <div class="card">
+                    <h4>Bienvenida al Ciclo Escolar</h4>
+                    <small>Publicado por: Dirección</small>
+                    <p>Esperamos que este nuevo ciclo esté lleno de aprendizajes para sus hijos.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN CALIFICACIONES (FUNCIONAL) -->
+        <div id="calificaciones" class="section">
+            <h3>Boleta de Calificaciones</h3>
+            <p style="color: #666; font-size: 0.9em; margin-bottom: 15px;">Estas calificaciones son actualizadas en tiempo real.</p>
+            <table class="styled-table">
+                <thead>
+                    <tr>
+                        <th>Materia</th>
+                        <th>1er Parcial</th>
+                        <th>2do Parcial</th>
+                        <th>3er Parcial</th>
+                        <th>Promedio Final</th>
+                    </tr>
+                </thead>
+                <tbody id="boletaBody">
+                    <tr><td colspan="5">Seleccione un alumno arriba...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- SECCIÓN ASISTENCIAS -->
+        <div id="asistencias" class="section">
+            <h3>Registro de Asistencias</h3>
+            <table class="styled-table">
+                <thead>
+                    <tr><th>Fecha</th><th>Estado</th><th>Observación</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td colspan="3">No hay asistencias registradas recientemente.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- SECCIÓN OBSERVACIONES -->
+        <div id="observaciones" class="section">
+            <h3>Observaciones y Conducta</h3>
+            <p>Historial de reportes y felicitaciones.</p>
+            <div class="card-container">
+                <!-- Aquí se cargarían dinámicamente -->
+                <div class="card warning">
+                    <h4>Ejemplo: Tarea pendiente</h4>
+                    <small>Fecha: 22/11/2024</small>
+                    <p>No entregó el trabajo de historia.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN EVIDENCIAS -->
+        <div id="evidencias" class="section">
+            <h3>Evidencias de Clase</h3>
+            <p>No hay evidencias nuevas cargadas.</p>
+        </div>
+
+        <!-- SECCIÓN CITAS -->
+        <div id="citas" class="section">
+            <h3>Gestión de Citas</h3>
+            <div style="display: flex; gap: 30px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 300px;">
+                    <h4>Solicitar Nueva Cita</h4>
+                    <label>Dirigido a:</label>
+                    <select><option>Docente de Grupo</option><option>Dirección</option></select>
+                    <label>Fecha y Hora sugerida:</label>
+                    <input type="datetime-local">
+                    <label>Motivo:</label>
+                    <textarea rows="3"></textarea>
+                    <button>Enviar Solicitud</button>
+                </div>
+                <!-- PEGAR ESTO ENTRE LA LÍNEA 169 Y 170 -->
+                <div style="flex: 1; min-width: 300px; border-left: 1px solid #eee; padding-left: 20px;">
+                    <h4>Mis Solicitudes / Historial</h4>
+                    <ul id="listaMisCitas" style="list-style: none; padding: 0;">
+                        <li>Cargando historial...</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN CHAT -->
+        <div id="chat" class="section">
+            <h3>Comunicación Directa</h3>
+            <div class="chat-container">
+                <div class="chat-sidebar-list">
+                    <div class="contact-item active">
+                        <strong>Docente de Grupo</strong>
+                        <p style="font-size: 12px; color: #666; margin: 5px 0 0 0;">Chat disponible</p>
+                    </div>
+                </div>
+                <div class="chat-area">
+                    <div class="chat-header">Conversación con: Docente de Grupo</div>
+                    <div class="chat-messages" id="chatMessages"></div>
+                    <div class="chat-input-area">
+                        <input type="text" id="msgInput" placeholder="Escriba un mensaje...">
+                        <button onclick="sendMessage()">Enviar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', async function() {
+        const userId = localStorage.getItem('loggedInUserId');
+        const userName = localStorage.getItem('loggedInUserName');
+
+        if (!userId) { window.location.href = 'login_tutor.html'; return; }
+        if (userName) document.getElementById('welcomeMessageTutor').textContent = `Bienvenido, ${userName}`;
+
+        cargarHijos(userId);
+        cargarAvisos();
+        cargarMisCitas(userId);
+        cargarChat(userId);
+
+        setInterval(() => cargarChat(userId), 5000); 
+    });
+
+    async function cargarHijos(userId) {
+        const sel = document.getElementById('studentSelect');
+        try {
+            // CORREGIDO: Ruta relativa
+            const res = await fetch(`/api/tutor/hijos/${userId}`);
+            const hijos = await res.json();
+            sel.innerHTML = '';
+            if(hijos.length > 0) {
+                hijos.forEach(h => {
+                    const opt = document.createElement('option');
+                    opt.value = h.ID_Alumno; opt.text = h.Nombre_Alumno;
+                    sel.appendChild(opt);
+                });
+                changeStudent();
+            } else { sel.innerHTML = '<option>Sin alumnos</option>'; }
+        } catch(e) { console.error(e); }
+    }
+
+    function changeStudent() {
+        const id = document.getElementById('studentSelect').value;
+        cargarCalificaciones(id);
+        cargarAsistencias(id);
+        cargarObservaciones(id);
+    }
+
+    async function cargarAsistencias(id) {
+        const tbody = document.querySelector('#asistencias tbody');
+        // CORREGIDO: Ruta relativa
+        const res = await fetch(`/api/alumno/asistencias/${id}`);
+        const data = await res.json();
+        tbody.innerHTML = '';
+        if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="3">Sin registros</td></tr>'; return; }
+
+        data.forEach(row => {
+            const fechaObj = new Date(row.Fecha_Asist);
+            const fechaBonita = `${fechaObj.getUTCDate()}/${fechaObj.getUTCMonth() + 1}/${fechaObj.getUTCFullYear()}`; 
+            let color = row.Estado_Asist==='presente'?'green':'red';
+            tbody.innerHTML += `<tr><td>${fechaBonita}</td><td style="color:${color}">${row.Estado_Asist.toUpperCase()}</td><td>-</td></tr>`;
+        });
+    }
+
+    // --- SECCIÓN CITAS DEL TUTOR (CORREGIDA) ---
+    document.querySelector('#citas button').onclick = async () => {
+        const inputs = document.querySelectorAll('#citas input, #citas textarea');
+        if(!inputs[0].value || !document.querySelector('#citas textarea').value) return alert("Llena los campos");
+        
+        // CORREGIDO: Ruta relativa
+        await fetch('/api/tutor/cita', {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ 
+                fecha: inputs[0].value.split('T')[0], 
+                hora: inputs[0].value.split('T')[1], 
+                motivo: document.querySelector('#citas textarea').value,
+                idUsuario: localStorage.getItem('loggedInUserId')
+            })
+        });
+        alert("Solicitud enviada");
+        cargarMisCitas(localStorage.getItem('loggedInUserId'));
+    };
+
+    async function cargarMisCitas(userId) {
+        const ul = document.getElementById('listaMisCitas');
+        // CORREGIDO: Ruta relativa
+        const res = await fetch(`/api/tutor/mis-citas/${userId}`);
+        const citas = await res.json();
+        ul.innerHTML = '';
+        if(citas.length === 0) { ul.innerHTML = '<li>No tienes citas solicitadas.</li>'; return; }
+
+        citas.forEach(c => {
+            let colorBadge = '#ffc107'; // Amarillo (Pendiente)
+            let textoEstado = 'Pendiente';
+            let fechaMostrar = c.FechaSolicitud_Cita;
+            let horaMostrar = c.HoraSolicitada_Cita;
+            let mensajeExtra = '';
+
+            // Si está confirmada, usamos la fecha confirmada (por si se reagendó)
+            if(c.Estado_Cita === 'Confirmada') {
+                colorBadge = '#28a745'; // Verde
+                textoEstado = 'Confirmada';
+                // Usamos la fecha confirmada si existe
+                if(c.FechaConfirmada_Cita) {
+                    fechaMostrar = c.FechaConfirmada_Cita;
+                    horaMostrar = c.HoraConfirmada_Cita;
+                    // Verificamos si cambió respecto a la solicitud
+                    if(c.FechaConfirmada_Cita !== c.FechaSolicitud_Cita || c.HoraConfirmada_Cita !== c.HoraSolicitada_Cita) {
+                        mensajeExtra = '<br><span style="color: #0056b3; font-size: 0.9em;">(Fecha actualizada por docente)</span>';
+                    }
+                }
+            } else if(c.Estado_Cita === 'Rechazada' || c.Estado_Cita === 'Cancelada') {
+                colorBadge = '#dc3545'; // Rojo
+                textoEstado = c.Estado_Cita;
+            }
+
+            const fechaUTC = new Date(fechaMostrar).toISOString().split('T')[0];
+            const horaCorta = horaMostrar.substring(0,5);
+
+            let html = `
+                <li style="background: #f9f9f9; padding: 10px; border-bottom: 1px solid #ddd; margin-bottom: 5px;">
+                    <strong>Docente: ${c.Nombre_Docente || 'Docente de Grupo'}</strong> <br>
+                    <small>Cita para: <b>${fechaUTC}</b> a las <b>${horaCorta}</b></small>
+                    ${mensajeExtra}
+                    <br>
+                    Estado: <span class="status-badge" style="background-color: ${colorBadge}; color: white;">${textoEstado}</span>
+            `;
+
+            if(c.Estado_Cita === 'Pendiente') {
+                html += `<button onclick="cancelarCita(${c.ID_Cita})" style="padding: 2px 8px; font-size: 11px; margin-left: 10px; background-color: #6c757d; border:none; color:white; border-radius:4px; cursor:pointer;">Cancelar</button>`;
+            }
+            html += `</li>`;
+            ul.innerHTML += html;
+        });
+    }
+
+    window.cancelarCita = async (idCita) => {
+        if(!confirm("¿Cancelar esta solicitud?")) return;
+        // CORREGIDO: Ruta relativa
+        await fetch('/api/tutor/cancelar-cita', {
+            method: 'PUT', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ idCita })
+        });
+        cargarMisCitas(localStorage.getItem('loggedInUserId'));
+    };
+
+    // Chat
+    async function cargarChat(userId) {
+        const div = document.getElementById('chatMessages');
+        // CORREGIDO: Ruta relativa
+        const res = await fetch('/api/chat/mensajes', {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ idUsuario: userId, rol: 'Tutor' })
+        });
+        const msgs = await res.json();
+        div.innerHTML = '';
+        msgs.forEach(m => {
+            div.innerHTML += `<div class="message received">${m.Contenido_Mnsj}</div>`;
+        });
+    }
+
+    window.sendMessage = async () => {
+        const inp = document.getElementById('msgInput');
+        if(!inp.value) return;
+        // CORREGIDO: Ruta relativa
+        await fetch('/api/chat/enviar', {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ contenido: inp.value, idUsuario: localStorage.getItem('loggedInUserId'), rol: 'Tutor', idDestinatario: null })
+        });
+        document.getElementById('chatMessages').innerHTML += `<div class="message sent">${inp.value}</div>`;
+        inp.value = '';
+    }
+
+    window.cargarCalificaciones = async function(id) {
+        const tbody = document.getElementById('boletaBody');
+        tbody.innerHTML = '<tr><td colspan="5">Cargando...</td></tr>';
+        try {
+            // CORREGIDO: Ruta relativa
+            const res = await fetch(`/api/alumno/calificaciones/${id}`);
+            const data = await res.json();
+            tbody.innerHTML = '';
+            if (data.length === 0) { tbody.innerHTML = '<tr><td colspan="5">No hay calificaciones.</td></tr>'; return; }
+            const materias = {};
+            data.forEach(d => {
+                if(!materias[d.Nombre_Materia]) materias[d.Nombre_Materia] = {p1:'-', p2:'-', p3:'-'};
+                if(d.Parcial_Calf == '1') materias[d.Nombre_Materia].p1 = d.Calificacion;
+                if(d.Parcial_Calf == '2') materias[d.Nombre_Materia].p2 = d.Calificacion;
+                if(d.Parcial_Calf == '3') materias[d.Nombre_Materia].p3 = d.Calificacion;
+            });
+            for(const [mat, notas] of Object.entries(materias)) {
+                let suma=0, c=0;
+                if(notas.p1!='-'){ suma+=parseFloat(notas.p1); c++;}
+                if(notas.p2!='-'){ suma+=parseFloat(notas.p2); c++;}
+                if(notas.p3!='-'){ suma+=parseFloat(notas.p3); c++;}
+                let prom = c>0 ? (suma/c).toFixed(1) : '-';
+                tbody.innerHTML += `<tr><td>${mat}</td><td>${notas.p1}</td><td>${notas.p2}</td><td>${notas.p3}</td><td><strong>${prom}</strong></td></tr>`;
+            }
+        } catch (e) { console.error(e); }
+    };
+
+    window.cargarObservaciones = async function(id) {
+        const container = document.querySelector('#observaciones .card-container');
+        try {
+            // CORREGIDO: Ruta relativa
+            const res = await fetch(`/api/alumno/observaciones/${id}`);
+            const data = await res.json();
+            container.innerHTML = '';
+            if(data.length === 0) { container.innerHTML = '<p>No hay observaciones.</p>'; return; }
+            data.forEach(obs => {
+                container.innerHTML += `<div class="card warning"><h4>${obs.Titulo_Obsserv}</h4><small>Fecha: ${new Date(obs.Fecha_Observ).toLocaleDateString()}</small><p>${obs.Descripcion_Ob}</p></div>`;
+            });
+        } catch(e){}
+    };
+
+    window.cargarAvisos = async function() {
+        const container = document.querySelector('#avisos .card-container');
+        try {
+            // CORREGIDO: Ruta relativa
+            const res = await fetch(`/api/avisos`);
+            const data = await res.json();
+            container.innerHTML = '';
+            data.forEach(aviso => {
+                container.innerHTML += `<div class="card"><h4>${aviso.Titulo_Aviso}</h4><small>${new Date(aviso.Fecha_Publicacion).toLocaleDateString()}</small><p>${aviso.Contenido_Aviso}</p></div>`;
+            });
+        } catch(e){}
+    };
+
+    window.logout = function() { localStorage.clear(); window.location.href='pagina inicio logo.html'; }
+    </script>
+</body>
+</html>

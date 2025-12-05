@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Directivo</title>
+    <style>
+        /* --- ESTILOS BASE --- */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #e9ecef; margin: 0; display: flex; color: #333; }
+        
+        /* --- SIDEBAR (Tema Oscuro - Directivo) --- */
+        .sidebar { width: 250px; background-color: #343a40; color: white; padding: 20px; box-shadow: 2px 0 10px rgba(0,0,0,0.1); min-height: 100vh; position: sticky; top: 0; }
+        .sidebar h3 { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #495057; padding-bottom: 15px; font-weight: 700; }
+        .sidebar a { display: block; color: #f8f9fa; padding: 12px 15px; text-decoration: none; border-bottom: 1px solid #495057; transition: all 0.3s ease; border-radius: 4px; font-weight: 500; margin-bottom: 5px;}
+        .sidebar a:hover { background-color: #495057; padding-left: 20px; }
+        
+        /* --- CONTENIDO PRINCIPAL --- */
+        .main-content { flex-grow: 1; padding: 30px; background-color: #f8f9fa; overflow-y: auto; height: 100vh; box-sizing: border-box; }
+        .main-content h2 { color: #333; margin-bottom: 25px; font-size: 28px; border-bottom: 2px solid #343a40; padding-bottom: 10px; display: inline-block; }
+        
+        /* --- SECCIONES (Tarjeta) --- */
+        .section { background-color: #fff; padding: 25px; margin-bottom: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e9ecef; transition: transform 0.2s; }
+        .section:hover { box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
+        .section h3 { color: #343a40; border-bottom: 2px solid #f1f1f1; padding-bottom: 10px; margin-top: 0; margin-bottom: 20px; }
+        
+        /* --- INPUTS --- */
+        label { display: block; margin-bottom: 5px; font-weight: 600; color: #555; margin-top: 15px; }
+        input[type="text"], input[type="date"], input[type="datetime-local"], textarea { 
+            width: 100%; padding: 10px 12px; margin: 5px 0 15px 0; 
+            border: 1px solid #ced4da; border-radius: 6px; box-sizing: border-box; 
+            font-size: 14px; transition: border-color 0.3s; 
+        }
+        input:focus, textarea:focus { border-color: #343a40; outline: none; }
+        
+        /* --- BOTONES --- */
+        button { background-color: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; margin-right: 10px; transition: background 0.3s; }
+        button:hover { background-color: #0056b3; transform: translateY(-1px); }
+        
+        /* Botón de acción negativa (Desactivar/Rechazar) */
+        button.deactivate { background-color: #dc3545; }
+        button.deactivate:hover { background-color: #c82333; }
+        
+        .file-upload { border: 2px dashed #ccc; padding: 30px; text-align: center; margin-top: 15px; border-radius: 10px; color: #666; background: #fafafa; }
+        
+        /* --- LISTAS --- */
+        ul { list-style: none; padding: 0; }
+        ul li { background-color: #fff; border: 1px solid #eee; padding: 15px; margin-bottom: 10px; border-radius: 6px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        ul li:hover { background-color: #f8f9fa; }
+        
+        hr { border: 0; border-top: 1px solid #eee; margin: 25px 0; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h3>Directivo</h3>
+        <a href="#alumnos">Gestionar Alumnos</a>
+        <a href="#usuarios">Gestionar Usuarios</a>
+        <a href="#validacion">Validar Contenido Docente</a>
+        <a href="#avisos">Gestionar Avisos</a>
+        <a href="#" onclick="logout()">Cerrar Sesión</a>
+    </div>
+    <div class="main-content">
+        <h2 id="welcomeMessageDirectivo">Bienvenido, Directivo</h2>
+
+        <div id="alumnos" class="section">
+            <h3>Gestionar Alumnos</h3>
+            <p style="color: #666;"><strong>Agregar Nuevo Alumno:</strong></p>
+            <input type="text" placeholder="Matrícula del Alumno">
+            <input type="text" placeholder="Nombre Completo">
+            <input type="text" placeholder="Grado">
+            <input type="text" placeholder="Grupo">
+            <button>Agregar Alumno</button>
+            <hr>
+            <p style="color: #666;"><strong>Desactivar Cuenta de Alumno:</strong></p>
+            <p style="font-size: 12px; color: #888; margin-top: -10px; margin-bottom: 10px;">
+                <em>* El alumno no podrá acceder al sistema, pero su historial académico se conserva.</em>
+            </p>
+            <input type="text" placeholder="Matrícula del Alumno a Desactivar">
+            <button class="deactivate" onclick="alert('Cuenta de alumno desactivada temporalmente.')">Desactivar Alumno</button>
+        </div>
+
+        <div id="usuarios" class="section">
+            <h3>Gestionar Usuarios (Docentes/Tutores)</h3>
+            <p style="color: #666;"><strong>Desactivar Acceso de Usuario:</strong></p>
+            <p style="font-size: 12px; color: #888; margin-top: -10px; margin-bottom: 10px;">
+                <em>* Suspende el acceso a docentes o tutores sin borrar sus registros.</em>
+            </p>
+            <input type="text" placeholder="ID de Usuario / Correo">
+            <button class="deactivate" onclick="alert('Usuario desactivado correctamente.')">Desactivar Usuario</button>
+        </div>
+
+        <div id="validacion" class="section">
+            <h3>Validar Contenido Docente</h3>
+            <p style="margin-bottom: 20px;">Aquí se mostrarían los archivos o información subida por los docentes para revisión y validación.</p>
+            <ul>
+                <li>
+                    <span>Tarea "Lectura Comprensiva" - Docente Juan Pérez</span>
+                    <div>
+                        <button style="padding: 5px 10px; font-size: 12px;">Ver</button>
+                        <button style="padding: 5px 10px; font-size: 12px; background-color: #28a745;">Validar</button>
+                        <button class="deactivate" style="padding: 5px 10px; font-size: 12px;">Rechazar</button>
+                    </div>
+                </li>
+                <li>
+                    <span>Plan de Clase "Matemáticas 3er Grado" - Docente María García</span>
+                    <div>
+                        <button style="padding: 5px 10px; font-size: 12px;">Ver</button>
+                        <button style="padding: 5px 10px; font-size: 12px; background-color: #28a745;">Validar</button>
+                        <button class="deactivate" style="padding: 5px 10px; font-size: 12px;">Rechazar</button>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- NUEVO APARTADO: SUBIR AVISOS -->
+        <div id="avisos" class="section">
+            <h3>Gestionar Avisos Generales</h3>
+            <p style="color: #666;"><strong>Crear Nuevo Aviso:</strong></p>
+            
+            <label for="aviso-titulo">Título del Aviso:</label>
+            <input type="text" id="aviso-titulo" placeholder="Ej. Suspensión de clases, Reunión de padres...">
+            
+            <label for="aviso-fecha">Fecha y Hora de Publicación:</label>
+            <input type="datetime-local" id="aviso-fecha">
+            
+            <label for="aviso-contenido">Contenido:</label>
+            <textarea id="aviso-contenido" rows="5" placeholder="Escribe el cuerpo del mensaje aquí..."></textarea>
+            
+            <button onclick="publicarAviso()">Publicar Aviso</button>
+        </div>
+
+    </div>
+
+    <script>
+       document.addEventListener('DOMContentLoaded', function() {
+        const userName = localStorage.getItem('loggedInUserName');
+        const userId = localStorage.getItem('loggedInUserId');
+        
+        if (!userId) { window.location.href = 'login.html'; return; } 
+        if (userName) {
+            document.getElementById('welcomeMessageDirectivo').textContent = `Bienvenido, ${userName}`;
+        }
+        
+        // Cargar las evidencias pendientes al iniciar
+        cargarValidaciones();
+    });
+
+    function logout() {
+        localStorage.clear(); 
+        window.location.href = 'pagina inicio logo.html'; 
+    }
+
+    // --- 1. AGREGAR ALUMNO ---
+    document.querySelector('#alumnos button').onclick = async function() {
+        // Seleccionamos los inputs en orden
+        const inputs = document.querySelectorAll('#alumnos input'); 
+        const matricula = inputs[0].value;
+        const nombre = inputs[1].value;
+        const grado = inputs[2].value;
+        const grupo = inputs[3].value;
+
+        if(!matricula || !nombre || !grado || !grupo) return alert("Por favor llena todos los campos del alumno.");
+
+        // CORREGIDO: Ruta relativa
+        const res = await fetch('/api/directivo/alumno', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ matricula, nombre, grado, grupo })
+        });
+
+        const data = await res.json();
+        alert(data.msg);
+        if(data.success) {
+            inputs.forEach(i => i.value = ''); // Limpiar campos
+        }
+    };
+
+    // --- 2. DESACTIVAR ALUMNO ---
+    document.querySelector('#alumnos .deactivate').onclick = async function() {
+        const inputs = document.querySelectorAll('#alumnos input');
+        // El input de matricula para desactivar es el 5to input en ese div (índice 4)
+        const matricula = inputs[4].value; 
+        
+        if(!matricula) return alert("Ingresa la matrícula del alumno a desactivar.");
+
+        if(!confirm("¿Estás seguro de desactivar a este alumno?")) return;
+
+        // CORREGIDO: Ruta relativa
+        const res = await fetch('/api/directivo/alumno/desactivar', {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ matricula })
+        });
+        const data = await res.json();
+        alert(data.msg);
+    };
+
+    // --- 3. DESACTIVAR USUARIO ---
+    document.querySelector('#usuarios button').onclick = async function() {
+        const criterio = document.querySelector('#usuarios input').value;
+        if(!criterio) return alert("Ingresa ID o Correo.");
+
+        if(!confirm("¿Desactivar acceso a este usuario?")) return;
+
+        // CORREGIDO: Ruta relativa
+        const res = await fetch('/api/directivo/usuario/desactivar', {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ criterio })
+        });
+        const data = await res.json();
+        alert(data.msg);
+    };
+
+    // --- 4. VALIDAR CONTENIDO (Carga Dinámica) ---
+    async function cargarValidaciones() {
+        const lista = document.querySelector('#validacion ul');
+        lista.innerHTML = '<li>Cargando pendientes...</li>';
+
+        try {
+            // CORREGIDO: Ruta relativa
+            const res = await fetch('/api/directivo/validaciones');
+            const evidencias = await res.json();
+
+            lista.innerHTML = '';
+            if(evidencias.length === 0) {
+                lista.innerHTML = '<li>No hay contenido pendiente de validación.</li>';
+                return;
+            }
+
+            evidencias.forEach(ev => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span>
+                        <strong>${ev.Titulo_Evidencia}</strong> (${ev.Nombre_Materia})<br>
+                        <small>Alumno: ${ev.Nombre_Alumno || 'Sin alumno'} - Gpo: ${ev.Letra_Grupo || 'N/A'}</small><br>
+                        <small style="color:#666">${ev.Descripcion_Evid}</small>
+                    </span>
+                    <div>
+                        <a href="${ev.Archivo_EvidUrl}" target="_blank" style="margin-right:10px; font-size:12px; text-decoration:underline;">Ver Archivo</a>
+                        <button onclick="procesarEvidencia(${ev.ID_Evidencia}, 'Validado')" style="padding: 5px 10px; font-size: 12px; background-color: #28a745;">Validar</button>
+                        <button onclick="procesarEvidencia(${ev.ID_Evidencia}, 'Rechazado')" class="deactivate" style="padding: 5px 10px; font-size: 12px;">Rechazar</button>
+                    </div>
+                `;
+                lista.appendChild(li);
+            });
+        } catch(e) { console.error(e); }
+    }
+
+    window.procesarEvidencia = async (id, estado) => {
+        if(!confirm(`¿Marcar como ${estado}?`)) return;
+        // CORREGIDO: Ruta relativa
+        await fetch('/api/directivo/validar', {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ idEvidencia: id, estado: estado })
+        });
+        alert(`Evidencia ${estado}`);
+        cargarValidaciones(); // Recargar lista
+    };
+
+    // --- 5. PUBLICAR AVISOS ---
+    window.publicarAviso = async function() {
+        const titulo = document.getElementById('aviso-titulo').value;
+        const fecha = document.getElementById('aviso-fecha').value;
+        const contenido = document.getElementById('aviso-contenido').value;
+        const userId = localStorage.getItem('loggedInUserId');
+
+        if(!titulo || !fecha || !contenido) return alert('Complete todos los campos.');
+
+        // CORREGIDO: Ruta relativa
+        await fetch('/api/directivo/aviso', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ 
+                titulo, 
+                contenido, 
+                fecha, 
+                idUsuario: userId 
+            })
+        });
+
+        alert('Aviso publicado correctamente');
+        // Limpiar
+        document.getElementById('aviso-titulo').value = '';
+        document.getElementById('aviso-contenido').value = '';
+    };
+    </script>
+</body>
+</html>

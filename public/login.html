@@ -1,0 +1,147 @@
+<!-- Archivo: public/login.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Escuela Ramón Beteta</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #eef2f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .login-container { 
+            background-color: #fff; 
+            padding: 40px; 
+            border-radius: 12px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+            width: 90%; 
+            max-width: 400px; 
+            text-align: center; 
+        }
+        .logo { max-width: 150px; margin-bottom: 20px; }
+        h2 { color: #2c3e50; margin-bottom: 20px; }
+        
+        .input-group { text-align: left; margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; color: #666; font-weight: 600; font-size: 0.9em; }
+        input { 
+            width: 100%; padding: 12px; border: 1px solid #ddd; 
+            border-radius: 6px; box-sizing: border-box; font-size: 16px; 
+            transition: border-color 0.3s;
+        }
+        input:focus { border-color: #ecb708; outline: none; }
+
+        button { 
+            background-color: #ecb708; color: white; padding: 12px; 
+            border: none; border-radius: 6px; cursor: pointer; 
+            font-size: 16px; width: 100%; font-weight: bold; margin-top: 10px;
+            transition: background 0.3s;
+        }
+        button:hover { background-color: #d4a406; }
+        
+        .error-msg { 
+            color: #dc3545; background-color: #ffe6e6; 
+            border: 1px solid #ffcccc; padding: 10px; 
+            border-radius: 4px; margin-top: 15px; display: none; font-size: 0.9em;
+        }
+        .back-link { display: block; margin-top: 20px; color: #666; text-decoration: none; font-size: 0.9em; }
+        .back-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <!-- Asegúrate de tener tu logo en la carpeta public o cambia el src -->
+        <img src="Logo.png.jpg" alt="Logo Escuela" class="logo">
+        <h2>Acceso al Portal</h2>
+        
+        <form id="unifiedLoginForm">
+            <div class="input-group">
+                <label for="usuario">Usuario o Correo</label>
+                <input type="text" id="usuario" placeholder="Ingresa tu usuario" required>
+            </div>
+            <div class="input-group">
+                <label for="password">Contraseña</label>
+                <input type="password" id="password" placeholder="********" required>
+            </div>
+            
+            <button type="submit" id="btnEntrar">Ingresar</button>
+            <div id="mensajeError" class="error-msg"></div>
+        </form>
+
+        <a href="pagina inicio logo.html" class="back-link">← Volver al inicio</a>
+        <div style="margin-top: 15px; font-size: 0.85em;">
+            ¿Eres tutor nuevo? <a href="registro_tutor.html" style="color:#007bff;">Regístrate aquí</a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('unifiedLoginForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const usuarioInput = document.getElementById('usuario');
+            const passwordInput = document.getElementById('password');
+            const btn = document.getElementById('btnEntrar');
+            const msgError = document.getElementById('mensajeError');
+
+            // UI: Mostrar carga
+            btn.textContent = 'Verificando...';
+            btn.disabled = true;
+            msgError.style.display = 'none';
+
+            try {
+                // Hacemos la petición a tu backend existente
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        usuario: usuarioInput.value, 
+                        password: passwordInput.value 
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Guardamos sesión
+                    localStorage.setItem('loggedInUserName', data.nombre);
+                    localStorage.setItem('loggedInUserId', data.id);
+                    localStorage.setItem('userRole', data.rol);
+
+                    // LÓGICA DE REDIRECCIÓN UNIFICADA
+                    // Convertimos a minúsculas y quitamos espacios para evitar errores
+                    const rol = data.rol.toLowerCase().trim();
+
+                    if (rol === 'directivo') {
+                        window.location.href = 'dashboard_directivo.html';
+                    } else if (rol === 'docente') {
+                        window.location.href = 'dashboard_docente.html';
+                    } else if (rol === 'tutor') {
+                        window.location.href = 'dashboard_tutor.html';
+                    } else {
+                        throw new Error('Rol de usuario desconocido: ' + data.rol);
+                    }
+
+                } else {
+                    // Error de credenciales
+                    msgError.textContent = data.msg || 'Usuario o contraseña incorrectos.';
+                    msgError.style.display = 'block';
+                    btn.textContent = 'Ingresar';
+                    btn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                msgError.textContent = 'Error de conexión. Intente más tarde.';
+                msgError.style.display = 'block';
+                btn.textContent = 'Ingresar';
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

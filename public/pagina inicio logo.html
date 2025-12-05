@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenido - Escuela Primaria Lic. Ramón Beteta</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #eef2f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container { 
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            width: 90%; 
+            max-width: 500px;
+            text-align: center;
+        }
+        .logo {
+            max-width: 300px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+        h1 { 
+            color: #2c3e50;
+            margin-bottom: 5px;
+            font-size: 2.2em;
+        }
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 2.5px;
+            font-size: 1.6em;
+            font-weight: normal;
+        }
+        h3 {
+            color: #555;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+            font-weight: normal;
+        }
+        p {
+            color: #555;
+            margin-bottom: 25px;
+            font-size: 1.1em;
+        }
+        .login-options button { 
+            background-color: #007bff; /* Color Azul para el botón principal */
+            color: white; 
+            padding: 15px 25px; 
+            border: none; 
+            border-radius: 8px;
+            cursor: pointer; 
+            font-size: 1.2em; 
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            max-width: 300px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .login-options button:hover { 
+            background-color: #fad046; /* Azul más oscuro al pasar el ratón */
+            transform: translateY(-2px);
+        }
+        .footer {
+            margin-top: 40px;
+            font-size: 0.9em;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Asegúrate de que la imagen esté en la carpeta 'public' -->
+        <img src="Logo.png.jpg" alt="Logo de la Escuela" class="logo">
+        
+        <h1>BIENVENIDO</h1>
+        <h2>Escuela Primaria Lic. Ramón Beteta</h2>
+        <h3>Turno Vespertino</h3>
+        <h3>CCT: 15EPR1268J</h3>
+        
+        <p>Sistema Integral de Control Escolar</p>
+        
+        <div class="login-options">
+            <!-- Botón único que lleva al login unificado -->
+            <button onclick="location.href='login.html'">INGRESAR AL PORTAL</button>
+        </div>
+        
+        <div class="footer">
+            &copy; 2025 Escuela Primaria Lic. Ramón Beteta. Todos los derechos reservados.
+        </div>
+    </div>
+</body>
+</html>

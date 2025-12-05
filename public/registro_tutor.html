@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - Tutor</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; text-align: center; padding-top: 50px; }
+        .register-container { background-color: #fff; margin: auto; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); width: 80%; max-width: 500px; }
+        h2 { color: #333; }
+        input[type="text"], input[type="password"], input[type="email"] { width: calc(100% - 20px); padding: 10px; margin: 8px 0; border: 1px solid #ddd; border-radius: 4px; }
+        button { background-color: #17a2b8; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 15px; }
+        button:hover { background-color: #138496; }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <h2>Registro de Tutor</h2>
+        <form action="login_tutor.html" method="post"> <!-- Cambiado para redirigir al login del tutor -->
+            <input type="text" placeholder="Nombre Completo" required>
+            <input type="email" placeholder="Correo Electrónico" required>
+            <input type="text" placeholder="Teléfono" required>
+            <input type="text" placeholder="Usuario" required>
+            <input type="password" placeholder="Contraseña" required>
+            <input type="text" placeholder="Matrícula del Hijo 1" required>
+            <input type="text" placeholder="Matrícula del Hijo 2 (Opcional)">
+            <input type="text" placeholder="Matrícula del Hijo 3 (Opcional)">
+            <!-- Se podría agregar un botón para "Agregar más matrículas" dinámicamente -->
+            <button type="submit">Registrarse</button>
+        </form>
+    </div>
+</body>
+</html>
