@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const path = require('path'); // IMPORTANTE: Necesario para las rutas de archivos
+const path = require('path');
 const { getConnection, sql } = require('./db');
 
 const app = express();
@@ -9,43 +9,34 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// --- CONFIGURACIÓN PARA SERVIR TU PÁGINA WEB (HTML/CSS) ---
-// Esto le dice al servidor que busque tus archivos en la carpeta 'public'
+// --- CONFIGURACIÓN PARA SERVIR TU PÁGINA WEB ---
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Ruta principal: Cuando entren a la web, mostrar 'pagina inicio logo.html'
+// Ruta principal
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'pagina inicio logo.html'));
 });
 
-// ================= LOGIN (MODO DEPURACIÓN) =================
+// ================= LOGIN UNIFICADO =================
 app.post('/api/login', async (req, res) => {
-    console.log("1. Intento de login recibido...");
-    console.log("   --> Datos recibidos del navegador:", req.body);
-
+    console.log("1. Intento de login:", req.body);
     const { usuario, password } = req.body;
     
     try {
         const pool = await getConnection();
-        console.log(`2. Consultando BD con: Usuario='${usuario}' y Pass='${password}'`);
-
         const result = await pool.request()
             .input('user', sql.VarChar, usuario)
             .input('pass', sql.VarChar, password)
             .query('SELECT * FROM Usuarios WHERE Correo_Usuario = @user AND Contraseña_Usuario = @pass AND Activo = 1');
 
-        console.log("3. Resultado de la BD (Filas encontradas):", result.recordset.length);
-
         if (result.recordset.length === 0) {
-            console.log("   --> ERROR: No se encontró el usuario en SQL.");
-            return res.json({ success: false, msg: 'Datos incorrectos' });
+            return res.json({ success: false, msg: 'Usuario o contraseña incorrectos' });
         }
 
         const user = result.recordset[0];
-        console.log("4. Usuario encontrado ID:", user.ID_Usuario, "Rol:", user.Rol_Usuario);
-        
         let nombre = 'Usuario';
 
+        // Buscamos el nombre real según el rol
         if (user.Rol_Usuario === 'Docente') {
             const r = await pool.request().input('id', sql.Int, user.ID_Usuario).query('SELECT Nombre_Docente FROM Docentes WHERE ID_DocenteUsuario = @id');
             if(r.recordset.length > 0) nombre = r.recordset[0].Nombre_Docente;
@@ -57,10 +48,9 @@ app.post('/api/login', async (req, res) => {
             if(r.recordset.length > 0) nombre = r.recordset[0].Nombre_Directivo;
         }
 
-        console.log("5. Login Exitoso. Nombre:", nombre);
         res.json({ success: true, id: user.ID_Usuario, nombre: nombre, rol: user.Rol_Usuario });
     } catch (error) { 
-        console.log("ERROR CRÍTICO:", error);
+        console.error(error);
         res.status(500).json({ msg: 'Error server' }); 
     }
 });
@@ -95,13 +85,14 @@ app.post('/api/docente/calificar', async (req, res) => {
     } catch (error) { res.status(500).json({ msg: error.message }); }
 });
 
-// 3. Publicar Aviso
+// 3. Publicar Aviso (DOCENTE - FECHA AUTOMATICA)
 app.post('/api/docente/aviso', async (req, res) => {
     try {
         const pool = await getConnection();
         await pool.request()
             .input('t', sql.VarChar, req.body.titulo).input('c', sql.Text, req.body.contenido)
             .input('idU', sql.Int, req.body.idUsuario)
+            // Se usa GETDATE() para la fecha automática
             .query('INSERT INTO Avisos (Titulo_Aviso, Contenido_Aviso, ID_AvisoUsuario, Fecha_Publicacion) VALUES (@t, @c, @idU, GETDATE())');
         res.json({ success: true });
     } catch (error) { res.status(500).json({ msg: error.message }); }
@@ -133,19 +124,20 @@ app.post('/api/docente/observacion', async (req, res) => {
     } catch (error) { res.status(500).json({ msg: error.message }); }
 });
 
-// 6. Subir Evidencia
+// 6. Subir Evidencia (DOCENTE - Nace como PENDIENTE)
 app.post('/api/docente/evidencia', async (req, res) => {
     try {
         const pool = await getConnection();
         await pool.request()
             .input('t', sql.VarChar, req.body.titulo).input('d', sql.VarChar, req.body.descripcion)
             .input('idA', sql.Int, req.body.idAlumno === 'all' ? null : req.body.idAlumno) 
-            .query('INSERT INTO Evidencias (Titulo_Evidencia, Descripcion_Evid, Fecha_EvidSubida, ID_EvidMateria) VALUES (@t, @d, GETDATE(), 1)');
+            // Fecha Automática y Estado 'Pendiente'
+            .query("INSERT INTO Evidencias (Titulo_Evidencia, Descripcion_Evid, Fecha_EvidSubida, ID_EvidMateria, Estado_Evidencia) VALUES (@t, @d, GETDATE(), 1, 'Pendiente')");
         res.json({ success: true });
     } catch (error) { res.status(500).json({ msg: error.message }); }
 });
 
-// 7. (DOCENTE) Obtener Solicitudes de Citas
+// 7. Citas Pendientes
 app.get('/api/docente/citas-pendientes/:idUsuario', async (req, res) => {
     try {
         const pool = await getConnection();
@@ -161,45 +153,36 @@ app.get('/api/docente/citas-pendientes/:idUsuario', async (req, res) => {
     } catch (error) { res.status(500).send(error.message); }
 });
 
-// 8. (DOCENTE) Responder Cita (Aceptar/Rechazar)
+// 8. Responder Cita
 app.put('/api/docente/responder-cita', async (req, res) => {
     try {
         const pool = await getConnection();
         await pool.request()
-            .input('idCita', sql.Int, req.body.idCita)
-            .input('estado', sql.VarChar, req.body.estado)
-            .input('fecha', sql.Date, req.body.fecha || null)
-            .input('hora', sql.Time, req.body.hora || null)
+            .input('idCita', sql.Int, req.body.idCita).input('estado', sql.VarChar, req.body.estado)
+            .input('fecha', sql.Date, req.body.fecha || null).input('hora', sql.Time, req.body.hora || null)
             .query(`UPDATE Citas SET Estado_Cita = @estado, FechaConfirmada_Cita = @fecha, HoraConfirmada_Cita = @hora WHERE ID_Cita = @idCita`);
         res.json({ success: true });
     } catch (error) { res.status(500).json({ msg: error.message }); }
 });
 
-// 9. (DOCENTE) Obtener Lista de Tutores (Para agendar manual)
+// 9. Tutores Lista
 app.get('/api/docente/tutores/:idUsuario', async (req, res) => {
     try {
         const pool = await getConnection();
         const docRes = await pool.request().input('id', sql.Int, req.params.idUsuario).query('SELECT ID_Docente FROM Docentes WHERE ID_DocenteUsuario = @id');
         const idDoc = docRes.recordset[0].ID_Docente;
-
-        // Traer tutores de los alumnos de sus grupos
         const result = await pool.request().input('idD', sql.Int, idDoc)
-            .query(`SELECT DISTINCT T.ID_Tutor, T.Nombre_Tutor, A.Nombre_Alumno
-                    FROM Tutores T
-                    JOIN Alumnos A ON A.ID_AlumnoTutor = T.ID_Tutor
-                    JOIN Grupo G ON A.ID_AlumnoGrupo = G.ID_Grupo
-                    WHERE G.ID_GrupoDocente = @idD`);
+            .query(`SELECT DISTINCT T.ID_Tutor, T.Nombre_Tutor, A.Nombre_Alumno FROM Tutores T JOIN Alumnos A ON A.ID_AlumnoTutor = T.ID_Tutor JOIN Grupo G ON A.ID_AlumnoGrupo = G.ID_Grupo WHERE G.ID_GrupoDocente = @idD`);
         res.json(result.recordset);
     } catch (error) { res.status(500).send(error.message); }
 });
 
-// 10. (DOCENTE) Agendar Cita Manual
+// 10. Cita Manual
 app.post('/api/docente/cita-manual', async (req, res) => {
     try {
         const pool = await getConnection();
         const docRes = await pool.request().input('id', sql.Int, req.body.idUsuario).query('SELECT ID_Docente FROM Docentes WHERE ID_DocenteUsuario = @id');
         const idDoc = docRes.recordset[0].ID_Docente;
-
         await pool.request()
             .input('f', sql.Date, req.body.fecha).input('h', sql.VarChar, req.body.hora).input('m', sql.VarChar, req.body.motivo)
             .input('idT', sql.Int, req.body.idTutor).input('idD', sql.Int, idDoc)
@@ -233,11 +216,17 @@ app.get('/api/alumno/calificaciones/:idAlumno', async (req, res) => {
     } catch (error) { res.status(500).send(error.message); }
 });
 
-// 3. Avisos
+// 3. Avisos (FILTRO 7 DIAS)
 app.get('/api/avisos', async (req, res) => {
     try {
         const pool = await getConnection();
-        const result = await pool.query('SELECT TOP 10 * FROM Avisos ORDER BY Fecha_Publicacion DESC');
+        // Solo avisos de los últimos 7 días
+        const result = await pool.query(`
+            SELECT TOP 10 * 
+            FROM Avisos 
+            WHERE Fecha_Publicacion >= DATEADD(day, -7, GETDATE()) 
+            ORDER BY Fecha_Publicacion DESC
+        `);
         res.json(result.recordset);
     } catch (error) { res.status(500).send(error.message); }
 });
@@ -262,29 +251,24 @@ app.get('/api/alumno/observaciones/:idAlumno', async (req, res) => {
     } catch (error) { res.status(500).send(error.message); }
 });
 
-// 6. Evidencias
+// 6. Evidencias (SOLO VALIDADAS)
 app.get('/api/evidencias', async (req, res) => {
     try {
         const pool = await getConnection();
-        const result = await pool.query('SELECT TOP 5 * FROM Evidencias ORDER BY Fecha_EvidSubida DESC');
+        // Filtro para mostrar solo lo validado
+        const result = await pool.query("SELECT TOP 5 * FROM Evidencias WHERE Estado_Evidencia = 'Validado' ORDER BY Fecha_EvidSubida DESC");
         res.json(result.recordset);
     } catch (error) { res.status(500).send(error.message); }
 });
 
-// 7. (TUTOR) Solicitar Cita
+// 7. Solicitar Cita
 app.post('/api/tutor/cita', async (req, res) => {
     try {
         const pool = await getConnection();
         const tRes = await pool.request().input('id', sql.Int, req.body.idUsuario).query('SELECT ID_Tutor FROM Tutores WHERE ID_TutorUsuario = @id');
         const idTutor = tRes.recordset[0].ID_Tutor;
 
-        const docRes = await pool.request().input('idT', sql.Int, idTutor).query(`
-            SELECT TOP 1 G.ID_GrupoDocente 
-            FROM Alumnos A 
-            INNER JOIN Grupo G ON A.ID_AlumnoGrupo = G.ID_Grupo 
-            WHERE A.ID_AlumnoTutor = @idT
-        `);
-        
+        const docRes = await pool.request().input('idT', sql.Int, idTutor).query(`SELECT TOP 1 G.ID_GrupoDocente FROM Alumnos A INNER JOIN Grupo G ON A.ID_AlumnoGrupo = G.ID_Grupo WHERE A.ID_AlumnoTutor = @idT`);
         if(docRes.recordset.length === 0) return res.json({ success: false, msg: "No se encontró docente asignado" });
         const idDocente = docRes.recordset[0].ID_GrupoDocente;
 
@@ -292,12 +276,11 @@ app.post('/api/tutor/cita', async (req, res) => {
             .input('f', sql.Date, req.body.fecha).input('h', sql.VarChar, req.body.hora).input('m', sql.VarChar, req.body.motivo)
             .input('idT', sql.Int, idTutor).input('idD', sql.Int, idDocente)
             .query("INSERT INTO Citas (FechaSolicitud_Cita, HoraSolicitada_Cita, Motivo_Cita, ID_CitaTutor, ID_CitaDocente, Estado_Cita) VALUES (@f, @h, @m, @idT, @idD, 'Pendiente')");
-        
         res.json({ success: true });
     } catch (error) { res.status(500).json({ msg: error.message }); }
 });
 
-// 8. (TUTOR) Ver Historial de Mis Citas
+// 8. Historial Citas
 app.get('/api/tutor/mis-citas/:idUsuario', async (req, res) => {
     try {
         const pool = await getConnection();
@@ -305,27 +288,21 @@ app.get('/api/tutor/mis-citas/:idUsuario', async (req, res) => {
         const idTutor = tRes.recordset[0].ID_Tutor;
 
         const result = await pool.request().input('idT', sql.Int, idTutor)
-            .query(`SELECT C.*, D.Nombre_Docente 
-                    FROM Citas C 
-                    INNER JOIN Docentes D ON C.ID_CitaDocente = D.ID_Docente 
-                    WHERE C.ID_CitaTutor = @idT ORDER BY C.FechaSolicitud_Cita DESC`);
+            .query(`SELECT C.*, D.Nombre_Docente FROM Citas C INNER JOIN Docentes D ON C.ID_CitaDocente = D.ID_Docente WHERE C.ID_CitaTutor = @idT ORDER BY C.FechaSolicitud_Cita DESC`);
         res.json(result.recordset);
     } catch (error) { res.status(500).send(error.message); }
 });
 
-// 9. (TUTOR) Cancelar Cita
+// 9. Cancelar Cita
 app.put('/api/tutor/cancelar-cita', async (req, res) => {
     try {
         const pool = await getConnection();
-        await pool.request().input('id', sql.Int, req.body.idCita)
-            .query("UPDATE Citas SET Estado_Cita = 'Cancelada' WHERE ID_Cita = @id");
+        await pool.request().input('id', sql.Int, req.body.idCita).query("UPDATE Citas SET Estado_Cita = 'Cancelada' WHERE ID_Cita = @id");
         res.json({ success: true });
     } catch (error) { res.status(500).json({ msg: error.message }); }
 });
 
 // ================= CHAT =================
-
-// Obtener Mensajes
 app.post('/api/chat/mensajes', async (req, res) => {
     try {
         const { idUsuario, rol } = req.body;
@@ -348,60 +325,60 @@ app.post('/api/chat/mensajes', async (req, res) => {
     } catch (error) { res.status(500).send(error.message); }
 });
 
-// Enviar Mensaje
 app.post('/api/chat/enviar', async (req, res) => {
     try {
         const { contenido, idUsuario, rol, idDestinatario } = req.body; 
         const pool = await getConnection();
-        
-        let idTutor = 0;
-        let idDocente = 0;
+        let idTutor = 0; let idDocente = 0;
 
         if (rol === 'Tutor') {
             const t = await pool.request().input('id', sql.Int, idUsuario).query('SELECT ID_Tutor FROM Tutores WHERE ID_TutorUsuario = @id');
             idTutor = t.recordset[0].ID_Tutor;
-            // Buscar Docente
             if(!idDestinatario) {
                 const doc = await pool.request().input('idT', sql.Int, idTutor).query('SELECT TOP 1 G.ID_GrupoDocente FROM Alumnos A JOIN Grupo G ON A.ID_AlumnoGrupo = G.ID_Grupo WHERE A.ID_AlumnoTutor = @idT');
                 idDocente = doc.recordset.length > 0 ? doc.recordset[0].ID_GrupoDocente : 1; 
-            } else {
-                idDocente = idDestinatario;
-            }
+            } else { idDocente = idDestinatario; }
         } else {
             const d = await pool.request().input('id', sql.Int, idUsuario).query('SELECT ID_Docente FROM Docentes WHERE ID_DocenteUsuario = @id');
             idDocente = d.recordset[0].ID_Docente;
             idTutor = idDestinatario; 
         }
 
-        await pool.request()
-            .input('cont', sql.Text, contenido)
-            .input('idT', sql.Int, idTutor)
-            .input('idD', sql.Int, idDocente)
+        await pool.request().input('cont', sql.Text, contenido).input('idT', sql.Int, idTutor).input('idD', sql.Int, idDocente)
             .query('INSERT INTO Mensajes (Contenido_Mnsj, Fecha_Mnsj, ID_MnsjTutor, ID_MnsjDocente) VALUES (@cont, GETDATE(), @idT, @idD)');
-        
         res.json({ success: true });
     } catch (error) { res.status(500).json({ msg: error.message }); }
 });
 
 // ================= DIRECTIVO =================
 
-// 1. Agregar Nuevo Alumno
+// 1. Agregar Nuevo Alumno (CORREGIDO Y DIAGNOSTICADO)
 app.post('/api/directivo/alumno', async (req, res) => {
     const { matricula, nombre, grado, grupo } = req.body;
+    console.log(`[REGISTRO] Buscando Grado: "${grado}" y Grupo: "${grupo}"`);
+
     try {
         const pool = await getConnection();
+        // Buscamos ID Grupo uniendo tablas
         const grupoRes = await pool.request()
             .input('nGrado', sql.VarChar, grado)
             .input('lGrupo', sql.VarChar, grupo)
-            .query(`SELECT G.ID_Grupo FROM Grupo G INNER JOIN Grado GR ON G.ID_GrupoGrado = GR.ID_Grado WHERE GR.Nombre_Grado = @nGrado AND G.Letra_Grupo = @lGrupo`);
+            .query(`
+                SELECT G.ID_Grupo 
+                FROM Grupo G 
+                INNER JOIN Grado GR ON G.ID_GrupoGrado = GR.ID_Grado 
+                WHERE GR.Nombre_Grado = @nGrado AND G.Letra_Grupo = @lGrupo
+            `);
 
         if (grupoRes.recordset.length === 0) {
-            return res.json({ success: false, msg: 'No se encontró el Grado/Grupo especificado.' });
+            return res.json({ success: false, msg: `No existe el Grado "${grado}" con Grupo "${grupo}". Verifica la BD.` });
         }
         const idGrupo = grupoRes.recordset[0].ID_Grupo;
+        
         await pool.request()
             .input('mat', sql.VarChar, matricula).input('nom', sql.VarChar, nombre).input('idG', sql.Int, idGrupo)
             .query(`INSERT INTO Alumnos (Matricula, Nombre_Alumno, ID_AlumnoGrupo, Activo) VALUES (@mat, @nom, @idG, 1)`);
+            
         res.json({ success: true, msg: 'Alumno registrado correctamente' });
     } catch (error) { res.status(500).json({ success: false, msg: error.message }); }
 });
@@ -411,8 +388,7 @@ app.put('/api/directivo/alumno/desactivar', async (req, res) => {
     const { matricula } = req.body;
     try {
         const pool = await getConnection();
-        const result = await pool.request().input('mat', sql.VarChar, matricula)
-            .query("UPDATE Alumnos SET Activo = 0 WHERE Matricula = @mat");
+        const result = await pool.request().input('mat', sql.VarChar, matricula).query("UPDATE Alumnos SET Activo = 0 WHERE Matricula = @mat");
         if(result.rowsAffected[0] > 0) res.json({ success: true, msg: 'Alumno desactivado' });
         else res.json({ success: false, msg: 'Matrícula no encontrada' });
     } catch (error) { res.status(500).json({ msg: error.message }); }
@@ -423,8 +399,7 @@ app.put('/api/directivo/usuario/desactivar', async (req, res) => {
     const { criterio } = req.body;
     try {
         const pool = await getConnection();
-        const result = await pool.request().input('crit', sql.VarChar, criterio)
-            .query("UPDATE Usuarios SET Activo = 0 WHERE Correo_Usuario = @crit OR CAST(ID_Usuario AS VARCHAR) = @crit");
+        const result = await pool.request().input('crit', sql.VarChar, criterio).query("UPDATE Usuarios SET Activo = 0 WHERE Correo_Usuario = @crit OR CAST(ID_Usuario AS VARCHAR) = @crit");
         if(result.rowsAffected[0] > 0) res.json({ success: true, msg: 'Usuario desactivado correctamente' });
         else res.json({ success: false, msg: 'Usuario no encontrado' });
     } catch (error) { res.status(500).json({ msg: error.message }); }
@@ -434,6 +409,7 @@ app.put('/api/directivo/usuario/desactivar', async (req, res) => {
 app.get('/api/directivo/validaciones', async (req, res) => {
     try {
         const pool = await getConnection();
+        // Solo trae PENDIENTES
         const result = await pool.query(`
             SELECT E.ID_Evidencia, E.Titulo_Evidencia, E.Descripcion_Evid, E.Archivo_EvidUrl, 
                    A.Nombre_Alumno, G.Letra_Grupo, M.Nombre_Materia
@@ -458,18 +434,19 @@ app.put('/api/directivo/validar', async (req, res) => {
     } catch (error) { res.status(500).json({ msg: error.message }); }
 });
 
-// 6. Aviso Directivo
+// 6. Aviso Directivo (FECHA AUTOMATICA)
 app.post('/api/directivo/aviso', async (req, res) => {
     try {
         const pool = await getConnection();
         await pool.request()
             .input('t', sql.VarChar, req.body.titulo).input('c', sql.Text, req.body.contenido)
-            .input('idU', sql.Int, req.body.idUsuario).input('fecha', sql.DateTime, req.body.fecha)
-            .query('INSERT INTO Avisos (Titulo_Aviso, Contenido_Aviso, ID_AvisoUsuario, Fecha_Publicacion, ID_AvisoGrupo) VALUES (@t, @c, @idU, @fecha, NULL)');
+            .input('idU', sql.Int, req.body.idUsuario)
+            // Fecha Automática
+            .query('INSERT INTO Avisos (Titulo_Aviso, Contenido_Aviso, ID_AvisoUsuario, Fecha_Publicacion, ID_AvisoGrupo) VALUES (@t, @c, @idU, GETDATE(), NULL)');
         res.json({ success: true });
     } catch (error) { res.status(500).json({ msg: error.message }); }
 });
 
-// PUERTO PARA LA NUBE (IMPORTANTE)
+// PUERTO
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`Servidor corriendo en puerto ${PORT}`));

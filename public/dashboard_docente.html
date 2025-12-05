@@ -36,42 +36,29 @@
         button { background-color: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; margin-right: 5px; margin-top: 5px; transition: background 0.3s; }
         button:hover { background-color: #218838; transform: translateY(-1px); }
         button.cancel { background-color: #dc3545; }
-        button.cancel:hover { background-color: #c82333; }
         button.reschedule { background-color: #ffc107; color: #333; }
-        button.reschedule:hover { background-color: #e0a800; }
 
-        /* --- TABLAS --- */
+        /* --- TABLAS Y CHAT --- */
         .styled-table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.95em; font-family: sans-serif; box-shadow: 0 0 20px rgba(0, 0, 0, 0.05); border-radius: 8px; overflow: hidden; }
         .styled-table thead tr { background-color: #343a40; color: #ffffff; text-align: left; }
         .styled-table th, .styled-table td { padding: 15px; border-bottom: 1px solid #dddddd; text-align: center; } 
         .styled-table th:first-child, .styled-table td:first-child { text-align: left; font-weight: 600; }
         .styled-table tbody tr:nth-of-type(even) { background-color: #f3f3f3; }
-        .styled-table tbody tr:hover { background-color: #f1f1f1; }
-        .styled-table tbody tr:last-of-type { border-bottom: 3px solid #ffc107; }
         .styled-table input[type="number"] { width: 70px; margin: 0 auto; text-align: center; display: inline-block; }
         .avg-display { font-weight: bold; color: #0056b3; font-size: 1.1em; }
 
-        /* --- OTROS --- */
         .request-list { list-style-type: none; padding: 0; }
         .request-list li { background-color: #fff; padding: 20px; border-left: 5px solid #17a2b8; margin-bottom: 15px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .request-meta { font-size: 0.9em; color: #666; margin-bottom: 8px; display: block; margin-top: 5px; }
 
-        .chat-container { display: flex; height: 550px; border: 1px solid #ddd; border-radius: 10px; overflow: hidden; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .chat-container { display: flex; height: 550px; border: 1px solid #ddd; border-radius: 10px; overflow: hidden; background: #fff; }
         .chat-sidebar-list { width: 35%; background-color: #f8f9fa; border-right: 1px solid #ddd; overflow-y: auto; }
-        .contact-item { padding: 15px 20px; border-bottom: 1px solid #eee; cursor: pointer; transition: background 0.2s; display: flex; justify-content: space-between; align-items: center; }
-        .contact-item:hover { background-color: #e9ecef; }
-        .contact-item.active { background-color: #fff3cd; border-left: 4px solid #ffc107; }
-        .contact-info h4 { margin: 0; font-size: 15px; color: #333; }
-        .contact-info p { margin: 5px 0 0; font-size: 12px; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
         .chat-area { width: 65%; display: flex; flex-direction: column; background-color: #fff; }
-        .chat-header { padding: 15px 20px; border-bottom: 1px solid #ddd; background-color: #f1f1f1; font-weight: bold; color: #555; }
         .chat-messages { flex-grow: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; background-color: #fafafa; }
-        .message { max-width: 75%; padding: 12px 16px; border-radius: 18px; font-size: 14px; line-height: 1.5; position: relative; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .message { max-width: 75%; padding: 12px 16px; border-radius: 18px; font-size: 14px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
         .message.received { background-color: #ffffff; align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid #eee; }
         .message.sent { background-color: #d1e7dd; align-self: flex-end; border-bottom-right-radius: 4px; color: #0f5132; }
-        .msg-time { font-size: 11px; color: #888; text-align: right; display: block; margin-top: 5px; font-style: normal; }
         .chat-input-area { padding: 20px; border-top: 1px solid #ddd; display: flex; background: #fff; gap: 10px; }
-        .chat-input-area input { margin: 0; border-radius: 25px; padding: 12px 20px; border: 1px solid #ccc; flex-grow: 1; }
+        .chat-input-area input { flex-grow: 1; margin: 0; border-radius: 25px; padding: 12px 20px; border: 1px solid #ccc; }
         .chat-input-area button { margin: 0; border-radius: 25px; padding: 0 30px; height: 42px; }
     </style>
 </head>
@@ -96,24 +83,20 @@
             <h3>Publicar Avisos Generales</h3>
             <p style="font-size: 14px; color: #666; margin-bottom: 20px;">Estos avisos serán visibles para todos los tutores.</p>
             <label><strong>Título del Aviso:</strong></label>
-            <input type="text" placeholder="Ej: Suspensión de clases, Festival escolar...">
+            <input type="text" placeholder="Ej: Suspensión de clases...">
             <label><strong>Contenido:</strong></label>
             <textarea rows="4" placeholder="Escriba aquí el detalle del aviso..."></textarea>
-            <label><strong>Fecha y Hora de Publicación:</strong></label>
-            <input type="datetime-local" id="avisoDate">
+            <!-- Eliminado Input de Fecha -->
             <button>Publicar Aviso</button>
         </div>
 
         <!-- OBSERVACIONES -->
         <div id="observaciones" class="section">
             <h3>Subir Observaciones del Alumno</h3>
-            <p style="font-size: 14px; color: #666; margin-bottom: 20px;">Reportes de conducta, logros académicos o notas puntuales.</p>
             <label><strong>Seleccionar Alumno:</strong></label>
-            <select>
-                <option value="">-- Selecciona un alumno --</option>
-            </select>
+            <select><option value="">-- Selecciona un alumno --</option></select>
             <label><strong>Título de la Observación:</strong></label>
-            <input type="text" placeholder="Ej: Comportamiento en clase, Tarea no entregada...">
+            <input type="text" placeholder="Ej: Comportamiento...">
             <label><strong>Descripción Detallada:</strong></label>
             <textarea rows="4" placeholder="Describa la situación..."></textarea>
             <label><strong>Fecha y Hora del Suceso:</strong></label>
@@ -121,107 +104,57 @@
             <button>Guardar Observación</button>
         </div>
 
-        <!-- CALIFICACIONES (Botones actualizados) -->
+        <!-- CALIFICACIONES -->
         <div id="calificaciones" class="section">
             <h3>Subir Calificaciones</h3>
             <div style="margin-bottom: 15px;">
-                <label for="selectAlumnoGrade"><strong>Seleccionar Alumno:</strong></label>
-                <select id="selectAlumnoGrade">
-                    <option value="">-- Cargando alumnos... --</option>
-                </select>
+                <label><strong>Seleccionar Alumno:</strong></label>
+                <select id="selectAlumnoGrade"><option value="">-- Cargando alumnos... --</option></select>
             </div>
-
             <table class="styled-table">
-                <thead>
-                    <tr>
-                        <th>Materia</th>
-                        <th>1er Parcial</th>
-                        <th>2do Parcial</th>
-                        <th>3er Parcial</th>
-                        <th>Promedio Final</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
+                <thead><tr><th>Materia</th><th>1er Parcial</th><th>2do Parcial</th><th>3er Parcial</th><th>Promedio</th><th>Acciones</th></tr></thead>
                 <tbody id="gradesBody">
-                    <tr>
-                        <td><strong>Matemáticas</strong></td>
-                        <td><input type="number" min="0" max="10" step="0.1" placeholder="0-10" oninput="calculateRow(this)"></td>
-                        <td><input type="number" min="0" max="10" step="0.1" placeholder="0-10" oninput="calculateRow(this)"></td>
-                        <td><input type="number" min="0" max="10" step="0.1" placeholder="0-10" oninput="calculateRow(this)"></td>
+                    <tr><td><strong>Matemáticas</strong></td>
+                        <td><input type="number" min="0" max="10" step="0.1" oninput="calculateRow(this)"></td>
+                        <td><input type="number" min="0" max="10" step="0.1" oninput="calculateRow(this)"></td>
+                        <td><input type="number" min="0" max="10" step="0.1" oninput="calculateRow(this)"></td>
                         <td><span class="avg-display">-</span></td>
-                        <!-- Botón actualizado para ID Materia 1 -->
                         <td><button onclick="guardarNota(this, 1)" style="padding: 5px 10px; font-size: 12px; margin: 0;">Guardar</button></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Historia</strong></td>
-                        <td><input type="number" min="0" max="10" step="0.1" placeholder="0-10" oninput="calculateRow(this)"></td>
-                        <td><input type="number" min="0" max="10" step="0.1" placeholder="0-10" oninput="calculateRow(this)"></td>
-                        <td><input type="number" min="0" max="10" step="0.1" placeholder="0-10" oninput="calculateRow(this)"></td>
-                        <td><span class="avg-display">-</span></td>
-                        <!-- Botón actualizado para ID Materia 2 -->
-                        <td><button onclick="guardarNota(this, 2)" style="padding: 5px 10px; font-size: 12px; margin: 0;">Guardar</button></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Ciencias</strong></td>
-                        <td><input type="number" min="0" max="10" step="0.1" placeholder="0-10" oninput="calculateRow(this)"></td>
-                        <td><input type="number" min="0" max="10" step="0.1" placeholder="0-10" oninput="calculateRow(this)"></td>
-                        <td><input type="number" min="0" max="10" step="0.1" placeholder="0-10" oninput="calculateRow(this)"></td>
-                        <td><span class="avg-display">-</span></td>
-                        <!-- Botón actualizado para ID Materia 3 -->
-                        <td><button onclick="guardarNota(this, 3)" style="padding: 5px 10px; font-size: 12px; margin: 0;">Guardar</button></td>
                     </tr>
                 </tbody>
             </table>
-            <p style="font-size: 12px; color: #666; margin-top: 10px;">* El promedio se calcula automáticamente al ingresar los tres parciales.</p>
         </div>
 
+        <!-- ASISTENCIAS -->
         <div id="asistencias" class="section">
             <h3>Registrar Asistencias</h3>
-            <label>Fecha:</label>
-            <input type="date" placeholder="Fecha">
-            <label>Alumno:</label>
-            <select><option value="">Selecciona Alumno</option></select>
+            <label>Fecha:</label><input type="date">
+            <label>Alumno:</label><select><option value="">Selecciona Alumno</option></select>
             <label>Estado:</label>
-            <select>
-                <option value="presente">Presente</option>
-                <option value="ausente">Ausente</option>
-                <option value="retardo">Retardo</option>
-            </select>
+            <select><option value="presente">Presente</option><option value="ausente">Ausente</option><option value="retardo">Retardo</option></select>
             <button>Registrar Asistencia</button>
         </div>
 
+        <!-- EVIDENCIAS -->
         <div id="evidencias" class="section">
             <h3>📷 Subir Evidencias de Clase</h3>
-            <p style="margin-bottom: 20px;">Sube fotos de actividades, tareas o documentos importantes.</p>
             <label><strong>Asignar a:</strong></label>
-            <select><option value="all">Todo el Grupo</option><option value="alumno1">Juan Pérez</option></select>
+            <select><option value="all">Todo el Grupo</option></select>
             <label><strong>Título de la Evidencia:</strong></label>
-            <input type="text" placeholder="Ej: Exposición de Biología...">
-            <label><strong>Fecha de la Evidencia:</strong></label>
-            <input type="datetime-local" id="evidenciaDate">
-            <label><strong>Archivo (Foto/PDF):</strong></label>
-            <input type="file" accept="image/*,.pdf,.doc,.docx" style="padding: 5px;">
+            <input type="text" placeholder="Ej: Exposición...">
             <label><strong>Descripción:</strong></label>
             <textarea rows="3" placeholder="Detalles..."></textarea>
             <button>📤 Publicar Evidencia</button>
         </div>
 
+        <!-- CITAS -->
         <div id="citas" class="section">
             <h3>Gestionar Citas con Tutores</h3>
             <div style="margin-bottom: 30px;">
-                <h4 style="color: #0056b3; border-bottom: 2px solid #e9ecef; padding-bottom: 10px;">🔔 Solicitudes de Citas</h4>
-                <ul class="request-list">
-                    <li>
-                        <strong>Tutor de Alumno 3 (Ana López)</strong>
-                        <span class="request-meta">Fecha solicitada: 2024-11-12 a las 09:00 AM</span>
-                        <span class="request-meta"><em>Motivo: "Discutir el comportamiento reciente en clase."</em></span>
-                        <div style="margin-top: 15px;">
-                            <button>Aceptar</button> <button class="reschedule">Reagendar</button> <button class="cancel">Rechazar</button>
-                        </div>
-                    </li>
-                </ul>
+                <h4 style="color: #0056b3; border-bottom: 2px solid #e9ecef;">🔔 Solicitudes de Citas</h4>
+                <ul class="request-list"><li>Cargando...</li></ul>
             </div>
-            <h4 style="border-bottom: 2px solid #e9ecef; padding-bottom: 10px;">Agendar Nueva Cita (Manual)</h4>
+            <h4>Agendar Nueva Cita (Manual)</h4>
             <label>Tutor:</label><select><option value="">Selecciona Tutor</option></select>
             <label>Fecha:</label><input type="date">
             <label>Hora:</label><input type="time">
@@ -229,20 +162,13 @@
             <button>Agendar Cita</button>
         </div>
 
+        <!-- CHAT -->
         <div id="chat" class="section">
             <h3>Mensajería</h3>
             <div class="chat-container">
-                <div class="chat-sidebar-list">
-                    <div class="contact-item active">
-                        <div class="contact-info"><h4>María García</h4><p>Hola...</p></div>
-                    </div>
-                </div>
+                <div class="chat-sidebar-list"><div class="contact-item active"><h4>Chat del Grupo</h4></div></div>
                 <div class="chat-area">
-                    <div class="chat-header">Conversación con: María García</div>
-                    <div class="chat-messages">
-                        <div class="message received">Hola, profesor. ¿Cómo va mi hijo?<span class="msg-time">23/11/2024 10:15 AM</span></div>
-                        <div class="message sent">Hola María, va muy bien.<span class="msg-time">23/11/2024 10:18 AM</span></div>
-                    </div>
+                    <div class="chat-messages"></div>
                     <div class="chat-input-area">
                         <input type="text" placeholder="Escribe un mensaje...">
                         <button>Enviar</button>
@@ -257,29 +183,22 @@
         document.addEventListener('DOMContentLoaded', async function() {
         const userName = localStorage.getItem('loggedInUserName');
         const userId = localStorage.getItem('loggedInUserId'); 
-
-        if (!userId) { window.location.href = 'login_docente.html'; return; }
+        if (!userId) { window.location.href = 'login.html'; return; }
         if (userName) document.getElementById('welcomeMessageDocente').textContent = `Bienvenido, ${userName}`;
 
         // Fechas por defecto
-        const now = new Date();
-        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-        if(document.getElementById('avisoDate')) document.getElementById('avisoDate').value = now.toISOString().slice(0, 16);
+        const now = new Date(); now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
         if(document.getElementById('observacionDate')) document.getElementById('observacionDate').value = now.toISOString().slice(0, 16);
-        if(document.getElementById('evidenciaDate')) document.getElementById('evidenciaDate').value = now.toISOString().slice(0, 16);
 
-        // Cargas iniciales
         cargarAlumnos(userId);
         cargarCitasPendientes(userId);
         cargarListaTutores(userId);
         cargarChat(userId);
-        
         setInterval(() => cargarChat(userId), 5000);
     });
 
     async function cargarAlumnos(userId) {
         try {
-            // CORREGIDO: Ruta relativa
             const res = await fetch(`/api/docente/alumnos/${userId}`);
             const alumnos = await res.json();
             const selects = [document.getElementById('selectAlumnoGrade'), document.querySelector('#observaciones select'), document.querySelector('#asistencias select:nth-of-type(1)')];
@@ -288,131 +207,44 @@
                 sel.innerHTML = '<option value="">-- Selecciona un alumno --</option>';
                 alumnos.forEach(al => {
                     const opt = document.createElement('option');
-                    opt.value = al.ID_Alumno;
-                    opt.textContent = `${al.Nombre_Alumno} (Gpo ${al.Letra_Grupo})`;
-                    sel.appendChild(opt);
+                    opt.value = al.ID_Alumno; opt.textContent = `${al.Nombre_Alumno} (Gpo ${al.Letra_Grupo})`; sel.appendChild(opt);
                 });
             });
-            
             const selEvi = document.querySelector('#evidencias select');
             selEvi.innerHTML = '<option value="all">Todo el Grupo</option>';
             alumnos.forEach(al => {
-                const opt = document.createElement('option');
-                opt.value = al.ID_Alumno;
-                opt.textContent = al.Nombre_Alumno;
-                selEvi.appendChild(opt);
+                const opt = document.createElement('option'); opt.value = al.ID_Alumno; opt.textContent = al.Nombre_Alumno; selEvi.appendChild(opt);
             });
         } catch (e) { console.error(e); }
     }
 
-    // --- FUNCIONES DE LOS BOTONES DE CITAS (CORREGIDO) ---
-    
-    // 1. Cargar la lista visualmente
     async function cargarCitasPendientes(userId) {
         const lista = document.querySelector('.request-list');
-        // CORREGIDO: Ruta relativa
         const res = await fetch(`/api/docente/citas-pendientes/${userId}`);
         const citas = await res.json();
-        
         lista.innerHTML = '';
-        if(citas.length === 0) {
-            lista.innerHTML = '<li>No hay solicitudes pendientes.</li>';
-            return;
-        }
+        if(citas.length === 0) { lista.innerHTML = '<li>No hay solicitudes pendientes.</li>'; return; }
 
         citas.forEach(cita => {
             const fechaOriginal = new Date(cita.FechaSolicitud_Cita).toISOString().split('T')[0];
             const horaOriginal = cita.HoraSolicitada_Cita.substring(0,5);
-            
-            lista.innerHTML += `
-            <li>
-                <strong>Tutor: ${cita.Nombre_Tutor}</strong><br>
-                <span class="request-meta">Solicita: ${fechaOriginal} - ${horaOriginal}</span>
-                <span class="request-meta"><em>Motivo: "${cita.Motivo_Cita}"</em></span>
-                
-                <div style="margin-top:15px;" id="botones-${cita.ID_Cita}">
-                    <!-- ACEPTAR: Envía la fecha original -->
-                    <button onclick="responderCita(${cita.ID_Cita}, 'Confirmada', '${fechaOriginal}', '${horaOriginal}')">Aceptar</button>
-                    <!-- REAGENDAR: Muestra formulario -->
-                    <button class="reschedule" onclick="mostrarFormReagenda(${cita.ID_Cita})">Reagendar</button>
-                    <!-- RECHAZAR: Envía null en fecha y hora -->
-                    <button class="cancel" onclick="responderCita(${cita.ID_Cita}, 'Rechazada', null, null)">Rechazar</button>
-                </div>
-
-                <div id="reagenda-${cita.ID_Cita}" style="display:none; margin-top:15px; background-color: #fff3cd; padding: 10px; border-radius: 5px;">
-                    <label style="margin-top:0;">Nueva Fecha:</label>
-                    <input type="date" id="newDate-${cita.ID_Cita}" value="${fechaOriginal}">
-                    <label>Nueva Hora:</label>
-                    <input type="time" id="newTime-${cita.ID_Cita}" value="${horaOriginal}">
-                    <div style="margin-top:10px;">
-                        <button onclick="confirmarReagenda(${cita.ID_Cita})">Confirmar Cambio</button>
-                        <button class="cancel" onclick="cancelarReagenda(${cita.ID_Cita})">Cancelar</button>
-                    </div>
-                </div>
-            </li>`;
+            lista.innerHTML += `<li><strong>Tutor: ${cita.Nombre_Tutor}</strong><br><span class="request-meta">Solicita: ${fechaOriginal} - ${horaOriginal}</span><br><em>"${cita.Motivo_Cita}"</em><div style="margin-top:15px;"><button onclick="responderCita(${cita.ID_Cita}, 'Confirmada', '${fechaOriginal}', '${horaOriginal}')">Aceptar</button><button class="cancel" onclick="responderCita(${cita.ID_Cita}, 'Rechazada', null, null)">Rechazar</button></div></li>`;
         });
     }
 
-    // 2. Función Principal para responder (Aceptar o Rechazar)
     window.responderCita = async (idCita, estado, fecha, hora) => {
         if(!confirm(`¿Estás seguro de marcar esta cita como: ${estado}?`)) return;
-        
-        // CORREGIDO: Ruta relativa
         await fetch('/api/docente/responder-cita', {
-            method: 'PUT',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ 
-                idCita: idCita, 
-                estado: estado, 
-                fecha: fecha,  // Si es rechazada, esto llegará como null, lo cual es correcto
-                hora: hora 
-            })
+            method: 'PUT', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ idCita, estado, fecha, hora })
         });
-        alert("Cita actualizada correctamente.");
-        cargarCitasPendientes(localStorage.getItem('loggedInUserId'));
+        alert("Cita actualizada"); cargarCitasPendientes(localStorage.getItem('loggedInUserId'));
     };
 
-    // 3. Funciones de Reagendado
-    window.mostrarFormReagenda = (id) => {
-        document.getElementById(`botones-${id}`).style.display = 'none';
-        document.getElementById(`reagenda-${id}`).style.display = 'block';
-    };
-
-    window.cancelarReagenda = (id) => {
-        document.getElementById(`botones-${id}`).style.display = 'block';
-        document.getElementById(`reagenda-${id}`).style.display = 'none';
-    };
-
-    window.confirmarReagenda = async (id) => {
-        const nuevaFecha = document.getElementById(`newDate-${id}`).value;
-        const nuevaHora = document.getElementById(`newTime-${id}`).value;
-        if(!nuevaFecha || !nuevaHora) return alert("Selecciona fecha y hora nuevas");
-
-        if(!confirm(`¿Reagendar para el ${nuevaFecha} a las ${nuevaHora}?`)) return;
-
-        // Reutilizamos la misma API pero con estado Confirmada y nuevos datos
-        // CORREGIDO: Ruta relativa
-        await fetch('/api/docente/responder-cita', {
-            method: 'PUT',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ 
-                idCita: id, 
-                estado: 'Confirmada', 
-                fecha: nuevaFecha, 
-                hora: nuevaHora 
-            })
-        });
-
-        alert("Cita reagendada y aceptada.");
-        cargarCitasPendientes(localStorage.getItem('loggedInUserId'));
-    };
-
-    // --- OTRAS FUNCIONES (Avisos, Obs, Asistencias, Chat) ---
-
+    // --- AVISOS (SIN FECHA) ---
     document.querySelector('#avisos button').addEventListener('click', async () => {
         const inputs = document.querySelectorAll('#avisos input, #avisos textarea');
         if(!inputs[0].value || !inputs[1].value) return alert("Llena todos los campos");
-        // CORREGIDO: Ruta relativa
         await fetch('/api/docente/aviso', {
             method: 'POST', headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ titulo: inputs[0].value, contenido: inputs[1].value, idUsuario: localStorage.getItem('loggedInUserId') })
@@ -420,84 +252,30 @@
         alert("Aviso publicado"); inputs[0].value=''; inputs[1].value='';
     });
 
-    document.querySelector('#observaciones button').addEventListener('click', async () => {
-        const idA = document.querySelector('#observaciones select').value;
-        const inputs = document.querySelectorAll('#observaciones input, #observaciones textarea');
-        if(!idA || !inputs[0].value) return alert("Faltan datos");
-        // CORREGIDO: Ruta relativa
-        await fetch('/api/docente/observacion', {
-            method: 'POST', headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ titulo: inputs[0].value, descripcion: inputs[1].value, fecha: inputs[2].value, idAlumno: idA, idUsuario: localStorage.getItem('loggedInUserId') })
-        });
-        alert("Observación guardada");
-    });
-
-    document.querySelector('#asistencias button').addEventListener('click', async () => {
-        const inputs = document.querySelector('#asistencias').querySelectorAll('input, select');
-        if(!inputs[0].value || !inputs[1].value) return alert("Faltan datos");
-        // CORREGIDO: Ruta relativa
-        await fetch('/api/docente/asistencia', {
-            method: 'POST', headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ fecha: inputs[0].value, idAlumno: inputs[1].value, estado: inputs[2].value })
-        });
-        alert("Asistencia guardada");
-    });
-
+    // --- EVIDENCIAS ---
     document.querySelector('#evidencias button').addEventListener('click', async () => {
-        alert("Evidencia subida (Simulada)");
+        const inputs = document.querySelectorAll('#evidencias input, #evidencias textarea, #evidencias select');
+        // inputs[0] select, inputs[1] titulo, inputs[2] desc
+        await fetch('/api/docente/evidencia', {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ idAlumno: inputs[0].value, titulo: inputs[1].value, descripcion: inputs[2].value })
+        });
+        alert("Evidencia subida (Pendiente de Aprobación)");
+        inputs[1].value=''; inputs[2].value='';
     });
 
-    // Cita Manual
-    const btnCitaManual = document.querySelector('#citas > button'); 
-    if(btnCitaManual) {
-        btnCitaManual.onclick = async () => {
-            const inputs = document.querySelectorAll('#citas input, #citas select, #citas textarea');
-            const idTutor = inputs[0].value; 
-            const fecha = inputs[1].value; 
-            const hora = inputs[2].value;
-            const motivo = document.querySelector('#citas textarea').value;
-            if(!idTutor || !fecha || !hora) return alert("Selecciona tutor, fecha y hora");
-            // CORREGIDO: Ruta relativa
-            await fetch('/api/docente/cita-manual', {
-                method: 'POST', headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ idTutor, fecha, hora, motivo, idUsuario: localStorage.getItem('loggedInUserId') })
-            });
-            alert("Cita agendada manualmente");
-        }
-    }
-
-    async function cargarListaTutores(userId) {
-        const selectTutor = document.querySelector('#citas select'); 
-        // CORREGIDO: Ruta relativa
-        const res = await fetch(`/api/docente/tutores/${userId}`);
-        const tutores = await res.json();
-        selectTutor.innerHTML = '<option value="">Selecciona Tutor</option>';
-        tutores.forEach(t => {
-            const opt = document.createElement('option');
-            opt.value = t.ID_Tutor; opt.textContent = `${t.Nombre_Tutor} (Tutor de ${t.Nombre_Alumno})`;
-            selectTutor.appendChild(opt);
-        });
-    }
-
-    // Chat
+    // --- CHAT ---
     async function cargarChat(idUsuario) {
         const div = document.querySelector('.chat-messages');
-        // CORREGIDO: Ruta relativa
-        const res = await fetch('/api/chat/mensajes', {
-            method: 'POST', headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ idUsuario, rol: 'Docente' })
-        });
+        const res = await fetch('/api/chat/mensajes', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ idUsuario, rol: 'Docente' }) });
         const msgs = await res.json();
         div.innerHTML = '';
-        msgs.forEach(m => {
-            div.innerHTML += `<div class="message received">${m.Contenido_Mnsj}</div>`;
-        });
+        msgs.forEach(m => div.innerHTML += `<div class="message received">${m.Contenido_Mnsj}</div>`);
     }
 
     document.querySelector('.chat-input-area button').onclick = async () => {
         const inp = document.querySelector('.chat-input-area input');
         if(!inp.value) return;
-        // CORREGIDO: Ruta relativa
         await fetch('/api/chat/enviar', {
             method: 'POST', headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ contenido: inp.value, idUsuario: localStorage.getItem('loggedInUserId'), rol: 'Docente', idDestinatario: 1 })
@@ -506,32 +284,36 @@
         inp.value = '';
     };
 
+    // --- CALIFICACIONES (Lógica Simplificada) ---
     window.calculateRow = function(input) { 
-        const row = input.closest('tr');
-        const inputs = row.querySelectorAll('input[type="number"]');
-        let suma = 0, count = 0;
-        inputs.forEach(inp => { if(inp.value) { suma += parseFloat(inp.value); count++; } });
-        row.querySelector('.avg-display').textContent = count === 3 ? (suma/3).toFixed(1) : "-";
+        const row = input.closest('tr'); const inputs = row.querySelectorAll('input[type="number"]');
+        let s=0, c=0; inputs.forEach(i=>{if(i.value){s+=parseFloat(i.value); c++}});
+        row.querySelector('.avg-display').textContent = c===3?(s/3).toFixed(1):"-";
     };
 
     window.guardarNota = async (boton, idMateria) => {
-        const row = boton.closest('tr');
-        const inputs = row.querySelectorAll('input[type="number"]');
+        const row = boton.closest('tr'); const inputs = row.querySelectorAll('input[type="number"]');
         const idAlumno = document.getElementById('selectAlumnoGrade').value;
-        const idDocente = localStorage.getItem('loggedInUserId');
         if (!idAlumno) return alert("Selecciona alumno");
-        let g=0;
         for (let i=0; i<3; i++) {
             if (inputs[i].value) {
-                // CORREGIDO: Ruta relativa
                 await fetch('/api/docente/calificar', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ calificacion: inputs[i].value, parcial: (i+1).toString(), idAlumno, idMateria, idDocente })
-                }); g++;
+                    body: JSON.stringify({ calificacion: inputs[i].value, parcial: (i+1).toString(), idAlumno, idMateria, idDocente: localStorage.getItem('loggedInUserId') })
+                });
             }
         }
-        if(g>0) alert("Notas guardadas");
+        alert("Notas guardadas");
     };
+
+    async function cargarListaTutores(userId) {
+        const selectTutor = document.querySelector('#citas select'); 
+        const res = await fetch(`/api/docente/tutores/${userId}`); const tutores = await res.json();
+        selectTutor.innerHTML = '<option value="">Selecciona Tutor</option>';
+        tutores.forEach(t => {
+            const opt = document.createElement('option'); opt.value = t.ID_Tutor; opt.textContent = `${t.Nombre_Tutor}`; selectTutor.appendChild(opt);
+        });
+    }
 
     window.logout = function() { localStorage.clear(); window.location.href='pagina inicio logo.html'; }
     </script>
