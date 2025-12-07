@@ -1,26 +1,23 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const fs = require('fs'); // Necesario para carpetas
-const multer = require('multer'); // Necesario para subir archivos
+const fs = require('fs'); 
+const multer = require('multer'); 
 const { getConnection, sql } = require('./db');
 
 const app = express();
 
 // --- CONFIGURACIÓN DE MULTER (SUBIDA DE ARCHIVOS) ---
-// 1. Crear carpeta si no existe
 const uploadDir = path.join(__dirname, 'public/uploads');
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// 2. Configurar dónde se guardan
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, uploadDir); // Guardar en public/uploads
+        cb(null, uploadDir); 
     },
     filename: function (req, file, cb) {
-        // Nombre único: fecha + nombre original (ej: 1782323-tarea.pdf)
         cb(null, Date.now() + '-' + file.originalname.replace(/\s/g, '_')); 
     }
 });
@@ -29,11 +26,8 @@ const upload = multer({ storage: storage });
 
 // --- MIDDLEWARE ---
 app.use(cors());
-app.use(express.json()); // Para leer JSON
-app.use(express.urlencoded({ extended: true })); // Para leer formularios normales
-
-// --- SERVIR ARCHIVOS ESTÁTICOS ---
-// Esto permite que el navegador pueda ver los archivos subidos (ej: tudominio.com/uploads/foto.jpg)
+app.use(express.json()); 
+app.use(express.urlencoded({ extended: true })); 
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Ruta principal
@@ -43,7 +37,7 @@ app.get('/', (req, res) => {
 
 // ================= LOGIN UNIFICADO =================
 app.post('/api/login', async (req, res) => {
-    console.log("1. Intento de login:", req.body);
+    console.log("Login:", req.body);
     const { usuario, password } = req.body;
     
     try {
@@ -78,7 +72,7 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// ================= DOCENTE =================
+// ================= DOCENTE (CORREGIDO) =================
 
 app.get('/api/docente/alumnos/:idUsuario', async (req, res) => {
     try {
@@ -141,26 +135,21 @@ app.post('/api/docente/observacion', async (req, res) => {
     } catch (error) { res.status(500).json({ msg: error.message }); }
 });
 
-// --- 6. SUBIR EVIDENCIA (MODIFICADO PARA ARCHIVOS) ---
-// Usamos 'upload.single' para procesar el archivo que viene del frontend
+// SUBIR EVIDENCIA (CON ARCHIVO)
 app.post('/api/docente/evidencia', upload.single('archivo'), async (req, res) => {
     try {
-        // Multer pone el archivo en req.file y los textos en req.body
         const { titulo, descripcion, idAlumno, idMateria } = req.body;
-        
-        // Si se subió archivo, guardamos la ruta relativa (ej: /uploads/archivo.jpg)
         const archivoUrl = req.file ? `/uploads/${req.file.filename}` : null;
-        const idAlum = idAlumno === 'all' ? null : idAlumno;
+        const idAlum = (idAlumno === 'all' || idAlumno === '') ? null : idAlumno;
 
         const pool = await getConnection();
         await pool.request()
             .input('t', sql.VarChar, titulo)
             .input('d', sql.VarChar, descripcion)
-            .input('url', sql.VarChar, archivoUrl) // Guardamos la URL
+            .input('url', sql.VarChar, archivoUrl)
             .input('idA', sql.Int, idAlum)
-            .input('idM', sql.Int, idMateria) // Guardamos la Materia
-            .query(`INSERT INTO Evidencias 
-                    (Titulo_Evidencia, Descripcion_Evid, Fecha_EvidSubida, ID_EvidMateria, Estado_Evidencia, Archivo_EvidUrl, ID_EvidAlumno) 
+            .input('idM', sql.Int, idMateria)
+            .query(`INSERT INTO Evidencias (Titulo_Evidencia, Descripcion_Evid, Fecha_EvidSubida, ID_EvidMateria, Estado_Evidencia, Archivo_EvidUrl, ID_EvidAlumno) 
                     VALUES (@t, @d, GETDATE(), @idM, 'Pendiente', @url, @idA)`);
         
         res.json({ success: true });
@@ -170,7 +159,7 @@ app.post('/api/docente/evidencia', upload.single('archivo'), async (req, res) =>
     }
 });
 
-// 7. Citas Pendientes
+// Citas Pendientes
 app.get('/api/docente/citas-pendientes/:idUsuario', async (req, res) => {
     try {
         const pool = await getConnection();
@@ -303,7 +292,7 @@ app.put('/api/tutor/cancelar-cita', async (req, res) => {
     } catch (error) { res.status(500).json({ msg: error.message }); }
 });
 
-// ================= CHAT =================
+// ================= CHAT (CORREGIDO CON LOGICA WHATSAPP) =================
 app.post('/api/chat/mensajes', async (req, res) => {
     try {
         const { idUsuario, rol } = req.body;
@@ -314,11 +303,11 @@ app.post('/api/chat/mensajes', async (req, res) => {
         if (rol === 'Docente') {
             const r = await pool.request().input('id', sql.Int, idUsuario).query('SELECT ID_Docente FROM Docentes WHERE ID_DocenteUsuario = @id');
             idActor = r.recordset[0].ID_Docente;
-            query = `SELECT M.*, T.Nombre_Tutor as RemitenteNombre FROM Mensajes M JOIN Tutores T ON M.ID_MnsjTutor = T.ID_Tutor WHERE ID_MnsjDocente = @idActor ORDER BY Fecha_Mnsj ASC`;
+            query = `SELECT M.*, T.Nombre_Tutor as OtroParticipante FROM Mensajes M JOIN Tutores T ON M.ID_MnsjTutor = T.ID_Tutor WHERE ID_MnsjDocente = @idActor ORDER BY Fecha_Mnsj ASC`;
         } else {
             const r = await pool.request().input('id', sql.Int, idUsuario).query('SELECT ID_Tutor FROM Tutores WHERE ID_TutorUsuario = @id');
             idActor = r.recordset[0].ID_Tutor;
-            query = `SELECT M.*, D.Nombre_Docente as RemitenteNombre FROM Mensajes M JOIN Docentes D ON M.ID_MnsjDocente = D.ID_Docente WHERE ID_MnsjTutor = @idActor ORDER BY Fecha_Mnsj ASC`;
+            query = `SELECT M.*, D.Nombre_Docente as OtroParticipante FROM Mensajes M JOIN Docentes D ON M.ID_MnsjDocente = D.ID_Docente WHERE ID_MnsjTutor = @idActor ORDER BY Fecha_Mnsj ASC`;
         }
         
         const msgs = await pool.request().input('idActor', sql.Int, idActor).query(query);
@@ -331,6 +320,7 @@ app.post('/api/chat/enviar', async (req, res) => {
         const { contenido, idUsuario, rol, idDestinatario } = req.body; 
         const pool = await getConnection();
         let idTutor = 0; let idDocente = 0;
+        let enviadoPor = rol; // Nuevo campo
 
         if (rol === 'Tutor') {
             const t = await pool.request().input('id', sql.Int, idUsuario).query('SELECT ID_Tutor FROM Tutores WHERE ID_TutorUsuario = @id');
@@ -345,13 +335,15 @@ app.post('/api/chat/enviar', async (req, res) => {
             idTutor = idDestinatario; 
         }
 
-        await pool.request().input('cont', sql.Text, contenido).input('idT', sql.Int, idTutor).input('idD', sql.Int, idDocente)
-            .query('INSERT INTO Mensajes (Contenido_Mnsj, Fecha_Mnsj, ID_MnsjTutor, ID_MnsjDocente) VALUES (@cont, GETDATE(), @idT, @idD)');
+        // Se agregó la columna EnviadoPor
+        await pool.request()
+            .input('cont', sql.Text, contenido).input('idT', sql.Int, idTutor).input('idD', sql.Int, idDocente).input('env', sql.VarChar, enviadoPor)
+            .query('INSERT INTO Mensajes (Contenido_Mnsj, Fecha_Mnsj, ID_MnsjTutor, ID_MnsjDocente, EnviadoPor) VALUES (@cont, GETDATE(), @idT, @idD, @env)');
         res.json({ success: true });
     } catch (error) { res.status(500).json({ msg: error.message }); }
 });
 
-// ================= DIRECTIVO =================
+// ================= DIRECTIVO (RESTAURADO) =================
 app.post('/api/directivo/alumno', async (req, res) => {
     const { matricula, nombre, grado, grupo } = req.body;
     try {

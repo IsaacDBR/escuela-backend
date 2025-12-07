@@ -200,32 +200,14 @@
 
     function changeStudent() {
         const id = document.getElementById('studentSelect').value;
-        cargarCalificaciones(id);
-        cargarAsistencias(id);
-        cargarObservaciones(id);
+        if(id) {
+            cargarCalificaciones(id);
+            cargarAsistencias(id);
+            cargarObservaciones(id);
+        }
     }
 
-    // Funciones de carga (Calificaciones, Asistencias, Observaciones, Avisos) se mantienen igual que tu versión funcional
-    // Solo resumo asistencias como pediste:
-    async function cargarAsistencias(id) {
-        const tbody = document.querySelector('#asistencias tbody');
-        const res = await fetch(`/api/alumno/asistencias/${id}`);
-        const data = await res.json();
-        tbody.innerHTML = '';
-        if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="2">Sin registros</td></tr>'; return; }
-        data.forEach(row => {
-            const fechaObj = new Date(row.Fecha_Asist);
-            const fechaBonita = fechaObj.toLocaleDateString();
-            let color = row.Estado_Asist==='presente'?'green':(row.Estado_Asist==='retardo'?'orange':'red');
-            tbody.innerHTML += `<tr><td>${fechaBonita}</td><td style="color:${color}; font-weight:bold;">${row.Estado_Asist.toUpperCase()}</td></tr>`;
-        });
-    }
-    
-    // ... (El resto de funciones cargarCalificaciones, cargarObservaciones, cargarAvisos, cargarMisCitas igual que antes) ...
-    // Agregar aquí tus funciones existentes para esas secciones o copiar del archivo anterior si funcionaban bien.
-    // Solo incluyo el cambio crítico en CHAT.
-
-    // --- CHAT TUTOR (MODIFICADO VISUALMENTE) ---
+    // --- CHAT TUTOR (CORREGIDO LADO DERECHO/IZQUIERDO) ---
     async function cargarChat(userId) {
         const div = document.getElementById('chatMessages');
         const res = await fetch('/api/chat/mensajes', {
@@ -236,20 +218,23 @@
         
         div.innerHTML = '';
         msgs.forEach(m => {
-            // Lógica visual: Si RemitenteNombre es el Docente -> Recibido.
-            // Si no (o si lo envié yo), asumimos Enviado (aunque el backend no lo distingue bien, usaremos estilo visual).
-            // NOTA: Como el backend trae "RemitenteNombre" como el Docente siempre en esta consulta, 
-            // todos parecerán "Recibidos" a menos que lo insertemos manualmente en JS.
-            
             const fecha = new Date(m.Fecha_Mnsj);
             const hora = fecha.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
             
+            // --- LÓGICA WHATSAPP INVERTIDA ---
+            // Si EnviadoPor es 'Tutor', soy yo (Tutor) -> Derecha (sent)
+            // Si EnviadoPor es 'Docente', es él -> Izquierda (received)
+            const esMio = m.EnviadoPor === 'Tutor';
+            const clase = esMio ? 'sent' : 'received';
+            
             div.innerHTML += `
-                <div class="message received">
+                <div class="message ${clase}">
                     ${m.Contenido_Mnsj}
                     <span class="message-time">${hora}</span>
                 </div>`;
         });
+        // Auto scroll al fondo si quieres
+        // div.scrollTop = div.scrollHeight;
     }
 
     window.sendMessage = async () => {
@@ -261,20 +246,11 @@
             body: JSON.stringify({ contenido: inp.value, idUsuario: localStorage.getItem('loggedInUserId'), rol: 'Tutor', idDestinatario: null })
         });
         
-        // Agregar visualmente (Sent)
-        const hora = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-        document.getElementById('chatMessages').innerHTML += `
-            <div class="message sent">
-                ${inp.value}
-                <span class="message-time">${hora}</span>
-            </div>`;
-        
         inp.value = '';
-        const d = document.getElementById('chatMessages');
-        d.scrollTop = d.scrollHeight;
+        cargarChat(localStorage.getItem('loggedInUserId'));
     }
 
-    // Funciones faltantes para completar el archivo (copia pegada de lo que ya tenías funcional):
+    // --- OTRAS FUNCIONES ---
     window.cargarCalificaciones = async function(id) {
         const tbody = document.getElementById('boletaBody');
         try {
@@ -303,6 +279,24 @@
         const container = document.querySelector('#observaciones .card-container');
         try { const res = await fetch(`/api/alumno/observaciones/${id}`); const data = await res.json(); container.innerHTML = ''; data.forEach(obs => { container.innerHTML += `<div class="card warning"><h4>${obs.Titulo_Obsserv}</h4><small>${new Date(obs.Fecha_Observ).toLocaleDateString()}</small><p>${obs.Descripcion_Ob}</p></div>`; }); } catch(e){}
     };
+    
+    window.cargarAsistencias = async function(id) {
+        const tbody = document.querySelector('#asistencias tbody');
+        try {
+            const res = await fetch(`/api/alumno/asistencias/${id}`);
+            const data = await res.json();
+            tbody.innerHTML = '';
+            if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="2">Sin registros</td></tr>'; return; }
+            data.forEach(row => {
+                const fechaObj = new Date(row.Fecha_Asist);
+                // Ajuste de zona horaria simple
+                fechaObj.setMinutes(fechaObj.getMinutes() + fechaObj.getTimezoneOffset());
+                const fechaBonita = fechaObj.toLocaleDateString();
+                let color = row.Estado_Asist==='presente'?'green':(row.Estado_Asist==='retardo'?'orange':'red');
+                tbody.innerHTML += `<tr><td>${fechaBonita}</td><td style="color:${color}; font-weight:bold;">${row.Estado_Asist.toUpperCase()}</td></tr>`;
+            });
+        } catch(e) {}
+    }
 
     window.cargarAvisos = async function() {
         const container = document.querySelector('#avisos .card-container');

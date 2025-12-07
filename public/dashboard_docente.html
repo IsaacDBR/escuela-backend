@@ -62,7 +62,9 @@
         .chat-messages { flex-grow: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; background-color: #fafafa; }
         
         .message { max-width: 75%; padding: 10px 14px; border-radius: 18px; font-size: 14px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); position: relative; }
+        /* Mensajes RECIBIDOS (Izquierda) */
         .message.received { background-color: #ffffff; align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid #eee; }
+        /* Mensajes ENVIADOS (Derecha) */
         .message.sent { background-color: #d1e7dd; align-self: flex-end; border-bottom-right-radius: 4px; color: #0f5132; }
         
         .message-time { display: block; font-size: 0.75em; margin-top: 4px; text-align: right; opacity: 0.7; }
@@ -92,27 +94,27 @@
         <div id="avisos" class="section">
             <h3>Publicar Avisos Generales</h3>
             <label><strong>Título del Aviso:</strong></label>
-            <input type="text" placeholder="Ej: Suspensión de clases...">
+            <input type="text" id="txtTituloAviso" placeholder="Ej: Suspensión de clases...">
             <label><strong>Contenido:</strong></label>
-            <textarea rows="4" placeholder="Escriba aquí el detalle del aviso..."></textarea>
-            <button>Publicar Aviso</button>
+            <textarea id="txtContenidoAviso" rows="4" placeholder="Escriba aquí el detalle del aviso..."></textarea>
+            <button onclick="publicarAviso()">Publicar Aviso</button>
         </div>
 
         <!-- OBSERVACIONES -->
         <div id="observaciones" class="section">
             <h3>Subir Observaciones del Alumno</h3>
             <label><strong>Seleccionar Alumno:</strong></label>
-            <select><option value="">-- Selecciona un alumno --</option></select>
+            <select id="selAlumnoObs"><option value="">-- Selecciona un alumno --</option></select>
             <label><strong>Título:</strong></label>
-            <input type="text" placeholder="Ej: Comportamiento...">
+            <input type="text" id="txtTituloObs" placeholder="Ej: Comportamiento...">
             <label><strong>Descripción:</strong></label>
-            <textarea rows="3"></textarea>
+            <textarea id="txtDescObs" rows="3"></textarea>
             <label><strong>Fecha y Hora:</strong></label>
             <input type="datetime-local" id="observacionDate">
-            <button>Guardar Observación</button>
+            <button onclick="guardarObservacion()">Guardar Observación</button>
         </div>
 
-        <!-- CALIFICACIONES (MODIFICADO: MATERIAS AGREGADAS) -->
+        <!-- CALIFICACIONES -->
         <div id="calificaciones" class="section">
             <h3>Subir Calificaciones</h3>
             <div style="margin-bottom: 15px;">
@@ -122,7 +124,6 @@
             <table class="styled-table">
                 <thead><tr><th>Materia</th><th>1er Parcial</th><th>2do Parcial</th><th>3er Parcial</th><th>Promedio</th><th>Acciones</th></tr></thead>
                 <tbody id="gradesBody">
-                    <!-- Fila Matemáticas (ID 1) -->
                     <tr><td><strong>Matemáticas</strong></td>
                         <td><input type="number" min="0" max="10" step="0.1" oninput="calculateRow(this)"></td>
                         <td><input type="number" min="0" max="10" step="0.1" oninput="calculateRow(this)"></td>
@@ -130,7 +131,6 @@
                         <td><span class="avg-display">-</span></td>
                         <td><button onclick="guardarNota(this, 1)" style="padding: 5px 10px; font-size: 12px; margin: 0;">Guardar</button></td>
                     </tr>
-                    <!-- Fila Español (ID 2) - AGREGADA -->
                     <tr><td><strong>Español</strong></td>
                         <td><input type="number" min="0" max="10" step="0.1" oninput="calculateRow(this)"></td>
                         <td><input type="number" min="0" max="10" step="0.1" oninput="calculateRow(this)"></td>
@@ -138,7 +138,6 @@
                         <td><span class="avg-display">-</span></td>
                         <td><button onclick="guardarNota(this, 2)" style="padding: 5px 10px; font-size: 12px; margin: 0;">Guardar</button></td>
                     </tr>
-                    <!-- Fila Ciencias (ID 3) - AGREGADA -->
                     <tr><td><strong>Ciencias</strong></td>
                         <td><input type="number" min="0" max="10" step="0.1" oninput="calculateRow(this)"></td>
                         <td><input type="number" min="0" max="10" step="0.1" oninput="calculateRow(this)"></td>
@@ -150,7 +149,7 @@
             </table>
         </div>
 
-        <!-- ASISTENCIAS (MODIFICADO: TABLA MASIVA) -->
+        <!-- ASISTENCIAS -->
         <div id="asistencias" class="section">
             <h3>Registrar Asistencias del Día</h3>
             <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 20px;">
@@ -173,31 +172,24 @@
             <button onclick="guardarAsistenciaMasiva()">Guardar Todo</button>
         </div>
 
-        <!-- EVIDENCIAS (MODIFICADO: INPUTS Y MATERIA) -->
+        <!-- EVIDENCIAS -->
         <div id="evidencias" class="section">
             <h3>📷 Subir Evidencias de Clase</h3>
             <label><strong>Asignar a:</strong></label>
-            <select><option value="all">Todo el Grupo</option></select>
-            
-            <!-- Campo Materia Agregado -->
+            <select id="selAlumnoEvidencia"><option value="all">Todo el Grupo</option></select>
             <label><strong>Materia:</strong></label>
             <select id="evidenciaMateria">
                 <option value="1">Matemáticas</option>
                 <option value="2">Español</option>
                 <option value="3">Ciencias</option>
             </select>
-
             <label><strong>Título de la Evidencia:</strong></label>
-            <input type="text" placeholder="Ej: Proyecto final...">
-            
+            <input type="text" id="txtTituloEvidencia" placeholder="Ej: Proyecto final...">
             <label><strong>Descripción:</strong></label>
-            <textarea rows="3" placeholder="Detalles de la tarea..."></textarea>
-            
-            <!-- Input File Agregado -->
+            <textarea id="txtDescEvidencia" rows="3" placeholder="Detalles de la tarea..."></textarea>
             <label><strong>Adjuntar Archivo (Foto/PDF):</strong></label>
             <input type="file" id="evidenciaFile">
-
-            <button>📤 Publicar Evidencia</button>
+            <button onclick="subirEvidencia()">📤 Publicar Evidencia</button>
         </div>
 
         <!-- CITAS -->
@@ -209,12 +201,11 @@
             </div>
         </div>
 
-        <!-- CHAT (MODIFICADO: LISTA DE TUTORES Y HORA) -->
+        <!-- CHAT -->
         <div id="chat" class="section">
             <h3>Mensajería con Padres de Familia</h3>
             <div class="chat-container">
                 <div class="chat-sidebar-list" id="listaTutoresChat">
-                    <!-- Aquí se cargarán los tutores -->
                     <div style="padding:20px; color:#666;">Cargando contactos...</div>
                 </div>
                 <div class="chat-area">
@@ -231,7 +222,6 @@
 
     <!-- SCRIPTS -->
     <script>
-        // Variable global para saber con qué tutor estamos hablando
         let currentChatTutorId = null;
 
         document.addEventListener('DOMContentLoaded', async function() {
@@ -240,7 +230,6 @@
             if (!userId) { window.location.href = 'login.html'; return; }
             if (userName) document.getElementById('welcomeMessageDocente').textContent = `Bienvenido, ${userName}`;
 
-            // Fechas por defecto
             const now = new Date();
             const dateStr = now.toISOString().split('T')[0];
             if(document.getElementById('asistenciaFecha')) document.getElementById('asistenciaFecha').value = dateStr;
@@ -253,20 +242,18 @@
             cargarCitasPendientes(userId);
             cargarListaTutoresParaChat(userId);
             
-            // Polling para el chat
             setInterval(() => {
                 if(currentChatTutorId) cargarMensajesChat(userId, currentChatTutorId);
             }, 5000);
         });
 
-        // 1. CARGAR ALUMNOS (LLENA SELECTS Y TABLA ASISTENCIA)
+        // 1. CARGAR ALUMNOS
         async function cargarAlumnos(userId) {
             try {
                 const res = await fetch(`/api/docente/alumnos/${userId}`);
                 const alumnos = await res.json();
                 
-                // Llenar selects simples
-                const selects = [document.getElementById('selectAlumnoGrade'), document.querySelector('#observaciones select')];
+                const selects = [document.getElementById('selectAlumnoGrade'), document.getElementById('selAlumnoObs')];
                 selects.forEach(sel => {
                     sel.innerHTML = '<option value="">-- Selecciona un alumno --</option>';
                     alumnos.forEach(al => {
@@ -275,14 +262,12 @@
                     });
                 });
                 
-                // Llenar select Evidencias
-                const selEvi = document.querySelector('#evidencias select');
+                const selEvi = document.getElementById('selAlumnoEvidencia');
                 selEvi.innerHTML = '<option value="all">Todo el Grupo</option>';
                 alumnos.forEach(al => {
                     const opt = document.createElement('option'); opt.value = al.ID_Alumno; opt.textContent = al.Nombre_Alumno; selEvi.appendChild(opt);
                 });
 
-                // LLENAR TABLA DE ASISTENCIA MASIVA
                 const tablaAsis = document.querySelector('#tablaAsistenciaMasiva tbody');
                 tablaAsis.innerHTML = '';
                 if(alumnos.length === 0) {
@@ -290,7 +275,6 @@
                 } else {
                     alumnos.forEach(al => {
                         const tr = document.createElement('tr');
-                        // La fecha es visual, ya que se tomará del input global al guardar
                         tr.innerHTML = `
                             <td style="text-align:left; padding-left:20px;">${al.Nombre_Alumno}</td>
                             <td class="fecha-celda">--</td> 
@@ -304,11 +288,9 @@
                         `;
                         tablaAsis.appendChild(tr);
                     });
-                    // Actualizar visualmente la fecha en las filas
                     actualizarFechaTabla();
                     document.getElementById('asistenciaFecha').addEventListener('change', actualizarFechaTabla);
                 }
-
             } catch (e) { console.error(e); }
         }
 
@@ -317,132 +299,139 @@
             document.querySelectorAll('.fecha-celda').forEach(td => td.textContent = fecha);
         }
 
-        // 2. GUARDAR ASISTENCIA MASIVA
+        // 2. PUBLICAR AVISOS (NUEVO)
+        async function publicarAviso() {
+            const titulo = document.getElementById('txtTituloAviso').value;
+            const contenido = document.getElementById('txtContenidoAviso').value;
+            if(!titulo || !contenido) return alert("Complete los campos del aviso");
+
+            const res = await fetch('/api/docente/aviso', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ titulo, contenido, idUsuario: localStorage.getItem('loggedInUserId') })
+            });
+            const data = await res.json();
+            if(data.success) {
+                alert("Aviso publicado");
+                document.getElementById('txtTituloAviso').value='';
+                document.getElementById('txtContenidoAviso').value='';
+            }
+        }
+
+        // 3. GUARDAR OBSERVACIONES (NUEVO)
+        async function guardarObservacion() {
+            const idAlumno = document.getElementById('selAlumnoObs').value;
+            const titulo = document.getElementById('txtTituloObs').value;
+            const desc = document.getElementById('txtDescObs').value;
+            const fecha = document.getElementById('observacionDate').value;
+            
+            if(!idAlumno || !titulo) return alert("Seleccione alumno y título");
+
+            const res = await fetch('/api/docente/observacion', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ titulo, descripcion: desc, fecha, idAlumno, idUsuario: localStorage.getItem('loggedInUserId') })
+            });
+            const data = await res.json();
+            if(data.success) {
+                alert("Observación guardada");
+                document.getElementById('txtTituloObs').value='';
+                document.getElementById('txtDescObs').value='';
+            }
+        }
+
+        // 4. EVIDENCIAS
+        async function subirEvidencia() {
+            const idAlumno = document.getElementById('selAlumnoEvidencia').value;
+            const idMateria = document.getElementById('evidenciaMateria').value;
+            const titulo = document.getElementById('txtTituloEvidencia').value;
+            const desc = document.getElementById('txtDescEvidencia').value;
+            const fileInput = document.getElementById('evidenciaFile');
+
+            if(!titulo) return alert("El título es obligatorio");
+
+            const formData = new FormData();
+            formData.append('titulo', titulo);
+            formData.append('descripcion', desc);
+            formData.append('idMateria', idMateria);
+            formData.append('idAlumno', idAlumno);
+            if(fileInput.files.length > 0) formData.append('archivo', fileInput.files[0]);
+
+            const res = await fetch('/api/docente/evidencia', { method: 'POST', body: formData });
+            const data = await res.json();
+            if(data.success) {
+                alert("Evidencia publicada correctamente.");
+                document.getElementById('txtTituloEvidencia').value='';
+                document.getElementById('txtDescEvidencia').value='';
+                fileInput.value = '';
+            } else alert("Error: " + data.msg);
+        }
+
+        // 5. ASISTENCIAS
         window.guardarAsistenciaMasiva = async () => {
             const fecha = document.getElementById('asistenciaFecha').value;
             const selects = document.querySelectorAll('.estado-asistencia');
-            
-            if(!confirm(`¿Guardar asistencia para ${selects.length} alumnos con fecha ${fecha}?`)) return;
-
-            // Enviamos uno por uno (limitación del backend actual)
-            // Idealmente el backend debería aceptar un array.
-            let errores = 0;
+            if(!confirm(`¿Guardar asistencia para ${selects.length} alumnos?`)) return;
             for(const sel of selects) {
-                const idAlumno = sel.getAttribute('data-id-alumno');
-                const estado = sel.value;
-                try {
-                    await fetch('/api/docente/asistencia', {
-                        method: 'POST', headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ fecha, estado, idAlumno })
-                    });
-                } catch(e) { errores++; }
+                await fetch('/api/docente/asistencia', {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ fecha, estado: sel.value, idAlumno: sel.getAttribute('data-id-alumno') })
+                });
             }
-
-            if(errores === 0) alert("Asistencias guardadas correctamente.");
-            else alert("Hubo errores al guardar algunas asistencias.");
+            alert("Asistencias guardadas.");
         };
 
-        // 3. CALIFICACIONES (Actualizado para múltiples materias)
+        // 6. CALIFICACIONES
         window.calculateRow = function(input) { 
             const row = input.closest('tr'); const inputs = row.querySelectorAll('input[type="number"]');
             let s=0, c=0; inputs.forEach(i=>{if(i.value){s+=parseFloat(i.value); c++}});
             row.querySelector('.avg-display').textContent = c===3?(s/3).toFixed(1):"-";
         };
-
         window.guardarNota = async (boton, idMateria) => {
             const row = boton.closest('tr'); const inputs = row.querySelectorAll('input[type="number"]');
             const idAlumno = document.getElementById('selectAlumnoGrade').value;
             if (!idAlumno) return alert("Selecciona alumno");
-            
-            let guardados = 0;
             for (let i=0; i<3; i++) {
                 if (inputs[i].value) {
                     await fetch('/api/docente/calificar', {
                         method: 'POST', headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ calificacion: inputs[i].value, parcial: (i+1).toString(), idAlumno, idMateria, idDocente: localStorage.getItem('loggedInUserId') })
                     });
-                    guardados++;
                 }
             }
-            if(guardados > 0) alert("Notas guardadas para esta materia.");
-            else alert("Ingresa al menos una nota.");
+            alert("Notas guardadas.");
         };
 
-       // 4. SUBIR EVIDENCIA (VERSIÓN FINAL CON ARCHIVOS REALES)
-document.querySelector('#evidencias button').addEventListener('click', async () => {
-    const idAlumno = document.querySelector('#evidencias select').value;
-    const idMateria = document.getElementById('evidenciaMateria').value;
-    const titulo = document.querySelector('#evidencias input[type="text"]').value;
-    const desc = document.querySelector('#evidencias textarea').value;
-    const fileInput = document.getElementById('evidenciaFile');
-
-    if(!titulo) return alert("El título es obligatorio");
-
-    // CREAMOS UN FORM DATA PARA ENVIAR ARCHIVOS
-    const formData = new FormData();
-    formData.append('titulo', titulo);
-    formData.append('descripcion', desc);
-    formData.append('idMateria', idMateria);
-    formData.append('idAlumno', idAlumno);
-    
-    // Si hay archivo, lo agregamos
-    if(fileInput.files.length > 0) {
-        formData.append('archivo', fileInput.files[0]);
-    }
-
-    try {
-        const res = await fetch('/api/docente/evidencia', {
-            method: 'POST',
-            // NOTA: Cuando usas FormData, NO debes poner Content-Type header manualmente
-            body: formData 
-        });
-        const data = await res.json();
-        if(data.success) {
-            alert("Evidencia publicada correctamente.");
-            document.querySelector('#evidencias input[type="text"]').value=''; 
-            document.querySelector('#evidencias textarea').value='';
-            fileInput.value = '';
-        } else {
-            alert("Error al subir: " + data.msg);
-        }
-    } catch (e) {
-        console.error(e);
-        alert("Error de conexión");
-    }
-});
-        // 5. CITAS (SIN CAMBIOS MAYORES)
+        // 7. CITAS
         async function cargarCitasPendientes(userId) {
             const lista = document.querySelector('.request-list');
             const res = await fetch(`/api/docente/citas-pendientes/${userId}`);
             const citas = await res.json();
             lista.innerHTML = '';
             if(citas.length === 0) { lista.innerHTML = '<li>No hay solicitudes pendientes.</li>'; return; }
-
             citas.forEach(cita => {
-                const fechaOriginal = new Date(cita.FechaSolicitud_Cita).toISOString().split('T')[0];
-                const horaOriginal = cita.HoraSolicitada_Cita.substring(0,5);
-                lista.innerHTML += `<li><strong>Tutor: ${cita.Nombre_Tutor}</strong><br><span class="request-meta">Solicita: ${fechaOriginal} - ${horaOriginal}</span><br><em>"${cita.Motivo_Cita}"</em><div style="margin-top:15px;"><button onclick="responderCita(${cita.ID_Cita}, 'Confirmada', '${fechaOriginal}', '${horaOriginal}')">Aceptar</button><button class="cancel" onclick="responderCita(${cita.ID_Cita}, 'Rechazada', null, null)">Rechazar</button></div></li>`;
+                const fecha = new Date(cita.FechaSolicitud_Cita).toLocaleDateString();
+                const hora = cita.HoraSolicitada_Cita.substring(0,5);
+                lista.innerHTML += `<li><strong>Tutor: ${cita.Nombre_Tutor}</strong><br>Solicita: ${fecha} - ${hora}<br><em>"${cita.Motivo_Cita}"</em><br><button onclick="responderCita(${cita.ID_Cita}, 'Confirmada')">Aceptar</button><button class="cancel" onclick="responderCita(${cita.ID_Cita}, 'Rechazada')">Rechazar</button></li>`;
             });
         }
-        window.responderCita = async (idCita, estado, fecha, hora) => {
-            if(!confirm(`¿Estás seguro de marcar esta cita como: ${estado}?`)) return;
+        window.responderCita = async (idCita, estado) => {
+            if(!confirm(`¿${estado} esta cita?`)) return;
+            const fecha = new Date().toISOString().split('T')[0]; // Fecha actual de confirmación
+            const hora = new Date().toTimeString().substring(0,5);
             await fetch('/api/docente/responder-cita', { method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ idCita, estado, fecha, hora }) });
             alert("Cita actualizada"); cargarCitasPendientes(localStorage.getItem('loggedInUserId'));
         };
 
-        // 6. CHAT MEJORADO (LISTA DE TUTORES Y TIMESTAMP)
+        // 8. CHAT MEJORADO (CON LOGICA WHATSAPP)
         async function cargarListaTutoresParaChat(userId) {
             const sidebar = document.getElementById('listaTutoresChat');
             const res = await fetch(`/api/docente/tutores/${userId}`); 
             const tutores = await res.json();
-            
             sidebar.innerHTML = '';
-            if(tutores.length === 0) sidebar.innerHTML = '<div style="padding:20px;">No hay tutores asignados.</div>';
-
+            if(tutores.length === 0) sidebar.innerHTML = '<div style="padding:20px;">No hay tutores.</div>';
             tutores.forEach(t => {
                 const div = document.createElement('div');
                 div.className = 'chat-contact';
-                div.innerHTML = `<strong>${t.Nombre_Tutor}</strong><br><small>Alumno: ${t.Nombre_Alumno}</small>`;
+                div.innerHTML = `<strong>${t.Nombre_Tutor}</strong><br><small>${t.Nombre_Alumno}</small>`;
                 div.onclick = () => abrirChat(t.ID_Tutor, t.Nombre_Tutor, div);
                 sidebar.appendChild(div);
             });
@@ -451,63 +440,34 @@ document.querySelector('#evidencias button').addEventListener('click', async () 
         function abrirChat(idTutor, nombreTutor, elementoDiv) {
             currentChatTutorId = idTutor;
             document.getElementById('chatHeader').textContent = `Chat con: ${nombreTutor}`;
-            
-            // UI Active
             document.querySelectorAll('.chat-contact').forEach(d => d.classList.remove('active'));
             elementoDiv.classList.add('active');
-
-            // Habilitar inputs
             document.getElementById('msgInput').disabled = false;
             document.getElementById('btnSend').disabled = false;
-
             cargarMensajesChat(localStorage.getItem('loggedInUserId'), idTutor);
         }
 
         async function cargarMensajesChat(idDocente, idTutor) {
             const div = document.querySelector('.chat-messages');
-            // Usamos el endpoint existente, pasando idDestinatario como si fuera el del filtro
-            // Nota: El endpoint original trae TODOS los mensajes del docente. 
-            // Para filtrarlo por tutor correctamente, lo haremos aquí en JS si el backend no filtra.
-            
             const res = await fetch('/api/chat/mensajes', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ idUsuario: idDocente, rol: 'Docente' }) });
-            const todosLosMensajes = await res.json();
+            const todos = await res.json();
             
-            // Filtramos solo los mensajes de este tutor (ID_MnsjTutor == idTutor)
-            const mensajesFiltrados = todosLosMensajes.filter(m => m.ID_MnsjTutor == idTutor);
+            // Filtrar solo los mensajes con este tutor específico
+            const filtrados = todos.filter(m => m.ID_MnsjTutor == idTutor);
 
             div.innerHTML = '';
-            mensajesFiltrados.forEach(m => {
-                // Determinar si es enviado o recibido
-                // Si RemitenteNombre es el tutor, entonces es RECIBIDO.
-                // Pero el endpoint devuelve "RemitenteNombre" genérico. 
-                // Mejor lógica: Si ID_MnsjTutor == idTutor (siempre true por el filtro) necesitamos saber la dirección.
-                // Asumimos que la BD no tiene campo "EnviadoPor", así que deducimos:
-                // El backend actual solo guarda mensajes. Falta un campo de "Quién lo envió".
-                // TRUCO TEMPORAL BASADO EN TU BACKEND:
-                // Tu backend actual NO guarda quién envió el mensaje (flag), solo el ID de Docente y Tutor.
-                // Asumiré que si el mensaje tiene texto, lo mostramos.
-                // *Corrección:* Como no puedo cambiar la BD, no puedo saber 100% quién lo envió sin ese campo.
-                // Asumiré que todos se alinean a la izquierda a menos que yo lo acabe de enviar.
-                // (Para corregir esto real, necesitas agregar un campo 'EnviadoPor' en la tabla Mensajes en tu SQL).
-                
-                // Por ahora, mostraré todos alineados a la izquierda con el nombre del remitente si viene del Tutor.
-                
-                // Simulacion visual basada en la estructura:
-                // Si el mensaje viene del Tutor (Nombre en el objeto), es recibido.
-                const esMio = false; // Sin campo en BD, es difícil saber. Lo dejaremos como "Recibido" por defecto.
-                
+            filtrados.forEach(m => {
                 const fecha = new Date(m.Fecha_Mnsj);
                 const hora = fecha.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-
-                // Como el endpoint del docente hace JOIN con Tutores, 'RemitenteNombre' es el Tutor.
-                // Si el mensaje lo envió el tutor, sale su nombre. Si lo envié yo, ¿qué sale?
-                // Tu backend: `SELECT M.*, T.Nombre_Tutor as RemitenteNombre ...`
-                // Esto significa que SIEMPRE traerá el nombre del Tutor. Es una limitante del backend actual.
-                // LO HAREMOS VISUALMENTE "NEUTRO" O ASUMIREMOS QUE TODO LO QUE LLEGA ES DEL TUTOR
-                // HASTA QUE ENVIES UNO TÚ.
                 
+                // --- LÓGICA WHATSAPP ---
+                // Si el mensaje fue enviado por 'Docente', es mío (derecha).
+                // Si fue enviado por 'Tutor', es recibido (izquierda).
+                const esMio = m.EnviadoPor === 'Docente';
+                const clase = esMio ? 'sent' : 'received';
+
                 div.innerHTML += `
-                    <div class="message received">
+                    <div class="message ${clase}">
                         ${m.Contenido_Mnsj}
                         <span class="message-time">${hora}</span>
                     </div>`;
@@ -527,19 +487,8 @@ document.querySelector('#evidencias button').addEventListener('click', async () 
                     idDestinatario: currentChatTutorId 
                 })
             });
-
-            // Agregar visualmente el mensaje como "Enviado" (Verde/Derecha)
-            const hora = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            document.querySelector('.chat-messages').innerHTML += `
-                <div class="message sent">
-                    ${inp.value}
-                    <span class="message-time">${hora}</span>
-                </div>`;
-            
             inp.value = '';
-            // Scroll al fondo
-            const d = document.querySelector('.chat-messages');
-            d.scrollTop = d.scrollHeight;
+            cargarMensajesChat(localStorage.getItem('loggedInUserId'), currentChatTutorId);
         };
 
         window.logout = function() { localStorage.clear(); window.location.href='pagina inicio logo.html'; }
